@@ -1,0 +1,73 @@
+# Python artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Test & Coverage
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+.pytest_cache/
+.hypothesis/
+nosetests.xml
+coverage.xml
+*.cover
+
+# Environment & Config
+.env
+.venv
+env/
+venv/
+ENV/
+.pm_config.toml
+.claude/
+.factory/
+CLAUDE.md
+
+# Logs & Local Data
+*.log
+pm_app.log*
+projects.json
+db.sqlite3
+db.sqlite3-journal
+
+# IDE & Tooling
+.idea/
+.vscode/
+.spyderproject
+.spyproject
+.ropeproject
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pyre/
+.ruff_cache/
+.ipynb_checkpoints
+.aider*
+
+# Project Specific
+TODO.txt
+parse_projects.py
