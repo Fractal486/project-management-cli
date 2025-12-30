@@ -213,33 +213,6 @@ project-management-cli/
 - **Renderer Pattern**: Pure rendering functions that read UI state
 - **Data Layer**: `ProjectManager` handles all persistence and caching
 
-## Development
-
-### Adding Features
-
-1. **New Screen**: Add state to `AppState` enum, create renderer in `pm_live/render/`
-2. **New Field**: Update `CustomField` definitions in `pm_live/custom_fields.py`
-3. **New Command**: Add command handler in `pm_cli.py`
-4. **New Handler**: Add event handler in `pm_live/handlers/`
-
-### Code Style
-
-- Use type hints for all function parameters and return values
-- Follow existing naming conventions (snake_case for functions, PascalCase for classes)
-- Add docstrings for public functions and classes
-- Keep functions focused and under 50 lines when possible
-- Test state transitions and edge cases
-
-### Key Files
-
-- **Data Models**: `pm.py` - Task, Project, ProjectManager, Bookmark classes
-- **Main App**: `pm_live/app.py` - LiveCLI application controller
-- **State Machine**: `pm_live/states.py` - All possible UI screens
-- **UI State**: `pm_live/ui_state.py` - Mutable UI state management
-- **Renderers**: `pm_live/render/` - Screen rendering functions
-- **Handlers**: `pm_live/handlers/` - Event handling logic
-
-For detailed development guidelines, see `CLAUDE.md`.
 
 ## License
 
