@@ -69,7 +69,7 @@ python pm_cli.py live
 python pm_live.py
 ```
 
-The live interface provides full keyboard navigation for all features. Press `?` for help within the app.
+The live interface provides full keyboard navigation for all features. Press `H` for help within the app.
 
 ## CLI Commands
 
