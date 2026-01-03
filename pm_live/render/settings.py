@@ -42,6 +42,7 @@ class SettingsRenderer(BaseRenderer):
             ("Configure Main Menu Tabs", "main_menu_tabs"),
             ("Deadline Display Mode", "deadline_display"),
             ("Task Metadata Display", "task_metadata"),
+            ("Project Browser Default Tab", "project_browser_tab"),
             ("Status Message Display", "message_display"),
             ("Show 'None' in Project Stats", "stats_none_toggle"),
             ("Bookmark Action Mode", "bookmark_action"),
@@ -339,6 +340,53 @@ class NotesDisplaySettingsRenderer(BaseRenderer):
             item_selected = selected_index == i
             selector = "[white]›[/white] " if item_selected else "  "
             enabled = value == mode
+            marker = "[green]●[/green]" if enabled else "[color(243)]○[/color(243)]"
+
+            # Dim unselected items
+            display_label = label if item_selected else f"[color(245)]{label}[/color(245)]"
+
+            self._console.print(f"  {selector}{marker} {display_label}")
+            self._console.print(f"    [color(243)]{description}[/color(243)]")
+
+        # Pad to push actions to bottom
+        self._pad_to_bottom()
+
+        back_index = len(options)
+        if selected_index == back_index:
+            self._console.print("  [white]›[/white] [yellow]←[/yellow] Back")
+        else:
+            self._console.print("    [color(245)]← Back[/color(245)]")
+
+        self._render_status_message(context)
+        return self._get_console_output()
+
+
+class ProjectBrowserDefaultTabRenderer(BaseRenderer):
+    """Renderer for configuring the default tab in project browser."""
+
+    def render(self, context: dict) -> str:
+        """Render the project browser default tab settings screen."""
+        self._reset_console_buffer()
+
+        selected_index = context['selected_index']
+        from ..config import get_config
+        config = get_config()
+        default_tab = config.project_browser_default_tab
+
+        self._console.print()
+        self._console.print("  [bold]Project Browser Default Tab[/bold]")
+        self._console.print("  [color(243)]Choose which tab opens first in the project browser[/color(243)]")
+        self._console.print()
+
+        options = [
+            ("all", "All Projects First", "Tab order: All   Active   Done"),
+            ("active", "Active Projects First", "Tab order: Active   Done   All"),
+        ]
+
+        for i, (value, label, description) in enumerate(options):
+            item_selected = selected_index == i
+            selector = "[white]›[/white] " if item_selected else "  "
+            enabled = value == default_tab
             marker = "[green]●[/green]" if enabled else "[color(243)]○[/color(243)]"
 
             # Dim unselected items

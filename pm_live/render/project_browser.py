@@ -40,8 +40,13 @@ class ProjectBrowserRenderer(BaseRenderer):
 
         self._console.print("\n[bold white]PROJECTS[/bold white]\n")
 
-        # Tabs - minimal pill style
-        tabs = ["All", "Active", "Done"]
+        # Tabs - order based on config
+        from ..config import get_config
+        config = get_config()
+        if config.project_browser_default_tab == "active":
+            tabs = ["Active", "Done", "All"]
+        else:
+            tabs = ["All", "Active", "Done"]
         tab_line_parts = []
         for i, tab_name in enumerate(tabs):
             if i == active_tab:

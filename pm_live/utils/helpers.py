@@ -17,12 +17,33 @@ def get_stats(projects: List[Project]) -> dict:
 
 
 def filter_projects_by_tab(projects: List[Project], tab_idx: int) -> List[Project]:
-    """Filter projects based on active tab."""
-    if tab_idx == 0:  # All
+    """Filter projects based on active tab.
+
+    Tab order depends on config.project_browser_default_tab:
+    - "all" (default): ["All", "Active", "Done"]
+    - "active": ["Active", "Done", "All"]
+    """
+    from ..config import get_config
+    config = get_config()
+
+    # Determine tab order based on config
+    if config.project_browser_default_tab == "active":
+        tabs = ["Active", "Done", "All"]
+    else:
+        tabs = ["All", "Active", "Done"]
+
+    # Get the tab name for the given index
+    if tab_idx < 0 or tab_idx >= len(tabs):
+        return projects  # Return all if index is out of bounds
+
+    tab_name = tabs[tab_idx]
+
+    # Filter based on tab name
+    if tab_name == "All":
         return projects
-    elif tab_idx == 1:  # Uncompleted
+    elif tab_name == "Active":
         return [p for p in projects if p.status != "Done"]
-    else:  # Completed
+    else:  # "Done"
         return [p for p in projects if p.status == "Done"]
 
 

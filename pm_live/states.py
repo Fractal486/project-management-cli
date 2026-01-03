@@ -22,6 +22,7 @@ class AppState(Enum):
     MAIN_MENU_TABS_SETTINGS = "main_menu_tabs_settings"
     DEADLINE_SETTINGS = "deadline_settings"
     TASK_METADATA_SETTINGS = "task_metadata_settings"
+    PROJECT_BROWSER_TAB_SETTINGS = "project_browser_tab_settings"
     STATS_NONE_SETTINGS = "stats_none_settings"
     BOOKMARK_ACTION_SETTINGS = "bookmark_action_settings"
     MESSAGE_DISPLAY_SETTINGS = "message_display_settings"

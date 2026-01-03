@@ -66,6 +66,9 @@ class Config:
     # Notes display mode: "dynamic" shows notes only when task selected, "always" shows notes always
     notes_display_mode: str = "dynamic"
 
+    # Project browser default tab: "all" shows all projects first, "active" shows active projects first
+    project_browser_default_tab: str = "all"
+
     def copy(self) -> "Config":
         """Return a deep copy suitable for mutation."""
         return copy.deepcopy(self)
@@ -167,6 +170,10 @@ def _apply_overrides(config: Config, overrides: Dict[str, Any]) -> None:
         value = str(overrides["notes_display_mode"]).strip().lower()
         if value in {"dynamic", "always"}:
             config.notes_display_mode = value
+    if "project_browser_default_tab" in overrides:
+        value = str(overrides["project_browser_default_tab"]).strip().lower()
+        if value in {"all", "active"}:
+            config.project_browser_default_tab = value
 
 def get_config() -> Config:
     """Get cached configuration, loading it on first access."""
@@ -223,6 +230,10 @@ status_message_mode = "{config.status_message_mode}"
 # Notes Display Mode
 # Options: "dynamic" (show only when task selected) | "always" (show always)
 notes_display_mode = "{config.notes_display_mode}"
+
+# Project Browser Default Tab
+# Options: "all" (All tab first) | "active" (Active tab first)
+project_browser_default_tab = "{config.project_browser_default_tab}"
 
 [theme_colors]
 """
