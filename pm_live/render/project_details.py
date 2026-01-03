@@ -211,12 +211,11 @@ class ProjectDetailsRenderer(BaseRenderer):
                     deadline_text = format_deadline(task.deadline).strip()
                     metadata_parts.append(f"[{metadata_color}]{deadline_text}[/{metadata_color}]")
 
-                # Add metadata to task_text only if metadata is "next_to"
+                # Task text with metadata on same line
                 task_text = base_text
-                if config.task_metadata_position == "next_to":
-                    if metadata_parts:
-                        metadata_content = " ".join(metadata_parts)
-                        task_text = f"{task_text}  {metadata_content}"
+                if metadata_parts:
+                    metadata_content = " ".join(metadata_parts)
+                    task_text = f"{task_text}  {metadata_content}"
 
                 # Indicate collapsed subtree if applicable
                 collapse_indicator = ""
@@ -273,11 +272,7 @@ class ProjectDetailsRenderer(BaseRenderer):
                         escaped_notes = rich_escape(notes_value)
                         self._console.print(f"{notes_indent}[color(238)]{escaped_notes}[/color(238)]")
 
-                # Display metadata on separate line if position is "below"
-                if config.task_metadata_position == "below" and metadata_parts:
-                    metadata_content = " ".join(metadata_parts)
-                    metadata_line = f"        {indent}  {metadata_content}"
-                    self._console.print(metadata_line)
+                # Metadata is shown on same line with task name (see above)
 
         self._console.print()
 

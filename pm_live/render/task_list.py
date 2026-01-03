@@ -142,9 +142,9 @@ class TaskListRenderer(BaseRenderer):
                 deadline_text = format_deadline(task.deadline).strip()
                 metadata_parts.append(deadline_text)
 
-            # Add metadata to task_text if position is "next_to"
+            # Task text with metadata on same line
             task_text_with_metadata = task_text
-            if config.task_metadata_position == "next_to" and metadata_parts:
+            if metadata_parts:
                 metadata_content = " ".join(metadata_parts)
                 task_text_with_metadata = f"{task_text} [{metadata_color}]{metadata_content}[/{metadata_color}]"
 
@@ -197,11 +197,7 @@ class TaskListRenderer(BaseRenderer):
                     escaped_notes = rich_escape(notes_value)
                     self._console.print(f"{notes_indent}[color(238)]{escaped_notes}[/color(238)]")
 
-            # Display metadata on separate line if position is "below"
-            if config.task_metadata_position == "below" and metadata_parts:
-                metadata_content = " ".join(metadata_parts)
-                metadata_line = f"  {indent}  [{metadata_color}]{metadata_content}[/{metadata_color}]"
-                self._console.print(metadata_line)
+            # Metadata is shown on same line with task name (see above)
 
         # Render sections with headers (only show section headers if list has multiple named sections)
         current_index = 0

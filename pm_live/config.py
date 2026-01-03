@@ -51,9 +51,6 @@ class Config:
     # Deadline display mode: "date" shows exact dates, "relative" shows days remaining
     deadline_display_mode: str = "relative"
 
-    # Task metadata position: "below" shows deadline/priority below task name, "next_to" shows on same line
-    task_metadata_position: str = "below"
-
     # Display "none" values for custom fields in project stats panels
     show_none_in_stats: bool = True
 
@@ -151,11 +148,6 @@ def _apply_overrides(config: Config, overrides: Dict[str, Any]) -> None:
         value = str(overrides["deadline_display_mode"]).strip().lower()
         if value in {"date", "relative"}:
             config.deadline_display_mode = value
-    # Task metadata position
-    if "task_metadata_position" in overrides:
-        value = str(overrides["task_metadata_position"]).strip().lower()
-        if value in {"below", "next_to"}:
-            config.task_metadata_position = value
     if "show_none_in_stats" in overrides:
         config.show_none_in_stats = bool(overrides["show_none_in_stats"])
     if "bookmark_action_mode" in overrides:
@@ -210,10 +202,6 @@ log_backup_count = {config.log_backup_count}
 # Deadline Display Mode
 # Options: "date" (exact dates) | "relative" (days remaining)
 deadline_display_mode = "{config.deadline_display_mode}"
-
-# Task Metadata Position
-# Options: "below" (below task name) | "next_to" (next to task name on same line)
-task_metadata_position = "{config.task_metadata_position}"
 
 # Project Stats Display
 # Toggle whether to display fields set to "none" in project stats panels

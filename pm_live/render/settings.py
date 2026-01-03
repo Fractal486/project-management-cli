@@ -41,7 +41,6 @@ class SettingsRenderer(BaseRenderer):
             ("Configure Quick Stats", "quick_stats"),
             ("Configure Main Menu Tabs", "main_menu_tabs"),
             ("Deadline Display Mode", "deadline_display"),
-            ("Task Metadata Display", "task_metadata"),
             ("Project Browser Default Tab", "project_browser_tab"),
             ("Status Message Display", "message_display"),
             ("Show 'None' in Project Stats", "stats_none_toggle"),
@@ -160,53 +159,6 @@ class DeadlineSettingsRenderer(BaseRenderer):
             self._console.print(f"    [color(243)]{description}[/color(243)]")
 
         # Pad to push actions to bottom
-        # Pad to push actions to bottom
-        self._pad_to_bottom()
-
-        back_index = len(options)
-        if selected_index == back_index:
-            self._console.print("  [white]›[/white] [yellow]←[/yellow] Back")
-        else:
-            self._console.print("    [color(245)]← Back[/color(245)]")
-
-        self._render_status_message(context)
-        return self._get_console_output()
-
-
-class TaskMetadataSettingsRenderer(BaseRenderer):
-    """Renderer for configuring task metadata display position."""
-
-    def render(self, context: dict) -> str:
-        """Render the task metadata settings screen."""
-        self._reset_console_buffer()
-
-        selected_index = context['selected_index']
-        from ..config import get_config
-        config = get_config()
-        position = config.task_metadata_position
-
-        self._console.print()
-        self._console.print("  [bold]Task Metadata[/bold]")
-        self._console.print("  [color(243)]Choose where to display priority and deadline for tasks[/color(243)]")
-        self._console.print()
-
-        options = [
-            ("below", "Below Task Name", "Display priority and deadline on a separate line below the task name"),
-            ("next_to", "Next to Task Name", "Display priority and deadline on the same line as the task name"),
-        ]
-
-        for i, (pos, label, description) in enumerate(options):
-            item_selected = selected_index == i
-            selector = "[white]›[/white] " if item_selected else "  "
-            enabled = pos == position
-            marker = "[green]●[/green]" if enabled else "[color(243)]○[/color(243)]"
-
-            # Dim unselected items
-            display_label = label if item_selected else f"[color(245)]{label}[/color(245)]"
-
-            self._console.print(f"  {selector}{marker} {display_label}")
-            self._console.print(f"    [color(243)]{description}[/color(243)]")
-
         # Pad to push actions to bottom
         self._pad_to_bottom()
 

@@ -1306,25 +1306,21 @@ class KeyHandlers:
             self.ui_state.state = AppState.SETTINGS
             self.ui_state.selected_index = 3
             _reset_pinned_nav()
-        elif self.ui_state.state == AppState.TASK_METADATA_SETTINGS:
+        elif self.ui_state.state == AppState.PROJECT_BROWSER_TAB_SETTINGS:
             self.ui_state.state = AppState.SETTINGS
             self.ui_state.selected_index = 4
             _reset_pinned_nav()
-        elif self.ui_state.state == AppState.PROJECT_BROWSER_TAB_SETTINGS:
+        elif self.ui_state.state == AppState.MESSAGE_DISPLAY_SETTINGS:
             self.ui_state.state = AppState.SETTINGS
             self.ui_state.selected_index = 5
             _reset_pinned_nav()
-        elif self.ui_state.state == AppState.MESSAGE_DISPLAY_SETTINGS:
+        elif self.ui_state.state == AppState.STATS_NONE_SETTINGS:
             self.ui_state.state = AppState.SETTINGS
             self.ui_state.selected_index = 6
             _reset_pinned_nav()
-        elif self.ui_state.state == AppState.STATS_NONE_SETTINGS:
-            self.ui_state.state = AppState.SETTINGS
-            self.ui_state.selected_index = 7
-            _reset_pinned_nav()
         elif self.ui_state.state == AppState.BOOKMARK_ACTION_SETTINGS:
             self.ui_state.state = AppState.SETTINGS
-            self.ui_state.selected_index = 8
+            self.ui_state.selected_index = 7
             _reset_pinned_nav()
         elif self.ui_state.state == AppState.ADD_PROJECT:
             self.ui_state.form_data = {}
@@ -1531,8 +1527,6 @@ class KeyHandlers:
             return len(MAIN_MENU_TABS_ORDER)  # Tabs + Back
         elif self.ui_state.state == AppState.DEADLINE_SETTINGS:
             return 2  # Two display modes (relative, date) + Back
-        elif self.ui_state.state == AppState.TASK_METADATA_SETTINGS:
-            return 2  # Two display positions (below, next_to) + Back
         elif self.ui_state.state == AppState.PROJECT_BROWSER_TAB_SETTINGS:
             return 2  # Two options (all, active) + Back
         elif self.ui_state.state == AppState.MESSAGE_DISPLAY_SETTINGS:

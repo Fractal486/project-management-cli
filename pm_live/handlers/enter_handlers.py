@@ -611,8 +611,6 @@ class EnterHandlers:
             self.handle_main_menu_tabs_settings_enter()
         elif self.ui_state.state == AppState.DEADLINE_SETTINGS:
             self.handle_deadline_settings_enter()
-        elif self.ui_state.state == AppState.TASK_METADATA_SETTINGS:
-            self.handle_task_metadata_settings_enter()
         elif self.ui_state.state == AppState.PROJECT_BROWSER_TAB_SETTINGS:
             self.handle_project_browser_tab_settings_enter()
         elif self.ui_state.state == AppState.STATS_NONE_SETTINGS:
@@ -1817,7 +1815,7 @@ class EnterHandlers:
 
     def handle_settings_enter(self):
         """Handle enter in settings."""
-        settings_items = ["clear_completed", "quick_stats", "main_menu_tabs", "deadline_display", "task_metadata", "project_browser_tab", "message_display", "stats_none_toggle", "bookmark_action", "export_data", "clear_logs", "help_overlay"]
+        settings_items = ["clear_completed", "quick_stats", "main_menu_tabs", "deadline_display", "project_browser_tab", "message_display", "stats_none_toggle", "bookmark_action", "export_data", "clear_logs", "help_overlay"]
         selected_idx = self.ui_state.selected_index
 
         if selected_idx == 0:
@@ -1855,36 +1853,30 @@ class EnterHandlers:
             self.ui_state.state = AppState.DEADLINE_SETTINGS
             self.ui_state.selected_index = 0
         elif selected_idx == 4:
-            # Configure task metadata display position
-            self.ui_state.inline_input_mode = False
-            self.ui_state.text_input_buffer = ""
-            self.ui_state.state = AppState.TASK_METADATA_SETTINGS
-            self.ui_state.selected_index = 0
-        elif selected_idx == 5:
             # Configure project browser default tab
             self.ui_state.inline_input_mode = False
             self.ui_state.text_input_buffer = ""
             self.ui_state.state = AppState.PROJECT_BROWSER_TAB_SETTINGS
             self.ui_state.selected_index = 0
-        elif selected_idx == 6:
+        elif selected_idx == 5:
             # Configure status message display
             self.ui_state.inline_input_mode = False
             self.ui_state.text_input_buffer = ""
             self.ui_state.state = AppState.MESSAGE_DISPLAY_SETTINGS
             self.ui_state.selected_index = 0
-        elif selected_idx == 7:
+        elif selected_idx == 6:
             # Configure stats none display
             self.ui_state.inline_input_mode = False
             self.ui_state.text_input_buffer = ""
             self.ui_state.state = AppState.STATS_NONE_SETTINGS
             self.ui_state.selected_index = 0
-        elif selected_idx == 8:
+        elif selected_idx == 7:
             # Configure bookmark action mode
             self.ui_state.inline_input_mode = False
             self.ui_state.text_input_buffer = ""
             self.ui_state.state = AppState.BOOKMARK_ACTION_SETTINGS
             self.ui_state.selected_index = 0
-        elif selected_idx == 9:
+        elif selected_idx == 8:
             # Export data (copy projects.json)
             self.ui_state.inline_input_mode = False
             self.ui_state.text_input_buffer = ""
@@ -1893,7 +1885,7 @@ class EnterHandlers:
                 self._set_status(f"Data exported to {export_status['filename']} in Downloads", False)
             else:
                 self._set_status(f"Export failed: {export_status['error']}", True)
-        elif selected_idx == 10:
+        elif selected_idx == 9:
             # Clear logs
             self.ui_state.inline_input_mode = False
             self.ui_state.text_input_buffer = ""
@@ -1920,14 +1912,14 @@ class EnterHandlers:
             except Exception as exc:
                 logger.error("Failed to clear log file: %s", exc)
                 self._set_status(f"Failed to clear logs: {str(exc)}", True)
-        elif selected_idx == 11:
+        elif selected_idx == 10:
             # Show all keybindings overlay from settings
             self.ui_state.inline_input_mode = False
             self.ui_state.text_input_buffer = ""
             self.ui_state.show_help = True
             self.ui_state.show_all_keybindings = True
             self._set_status(None)
-        elif selected_idx == 12:
+        elif selected_idx == 11:
             # Back to main menu
             self.ui_state.state = AppState.MAIN_MENU
             self.ui_state.selected_index = 0
@@ -2008,28 +2000,6 @@ class EnterHandlers:
             self.ui_state.selected_index = 3
             self._set_status(None)
 
-    def handle_task_metadata_settings_enter(self):
-        """Handle enter in task metadata display configuration."""
-        from ..config import get_config, set_config, save_config
-
-        options = ["below", "next_to"]
-        selected_idx = self.ui_state.selected_index
-
-        if selected_idx < len(options):
-            # Toggle task metadata display position
-            new_position = options[selected_idx]
-            config = get_config()
-            config.task_metadata_position = new_position
-            set_config(config)
-            save_config(config)
-
-            self._set_status(None)
-        else:
-            # Back to settings
-            self.ui_state.state = AppState.SETTINGS
-            self.ui_state.selected_index = 4
-            self._set_status(None)
-
     def handle_project_browser_tab_settings_enter(self):
         """Handle enter in project browser default tab configuration."""
         from ..config import get_config, set_config, save_config
@@ -2049,7 +2019,7 @@ class EnterHandlers:
         else:
             # Back to settings
             self.ui_state.state = AppState.SETTINGS
-            self.ui_state.selected_index = 5
+            self.ui_state.selected_index = 4
             self._set_status(None)
 
     def handle_stats_none_settings_enter(self):
@@ -2071,7 +2041,7 @@ class EnterHandlers:
         else:
             # Back to settings
             self.ui_state.state = AppState.SETTINGS
-            self.ui_state.selected_index = 7
+            self.ui_state.selected_index = 6
             self._set_status(None)
 
     def handle_message_display_settings_enter(self):
@@ -2091,7 +2061,7 @@ class EnterHandlers:
         else:
             # Back to settings
             self.ui_state.state = AppState.SETTINGS
-            self.ui_state.selected_index = 6
+            self.ui_state.selected_index = 5
             self._set_status(None)
 
     def handle_notes_display_settings_enter(self):
@@ -2133,7 +2103,7 @@ class EnterHandlers:
         else:
             # Back to settings
             self.ui_state.state = AppState.SETTINGS
-            self.ui_state.selected_index = 8
+            self.ui_state.selected_index = 7
             self._set_status(None)
 
     def handle_delete_confirmation_enter(self):

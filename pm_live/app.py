@@ -32,7 +32,7 @@ from .main_menu_tabs import (
 from .render import (
     rich_to_formatted_text, MainMenuRenderer, ProjectBrowserRenderer,
     ProjectDetailsRenderer, TaskListRenderer, StatisticsRenderer,
-    SettingsRenderer, QuickStatsSettingsRenderer, MainMenuTabsRenderer, DeadlineSettingsRenderer, TaskMetadataSettingsRenderer, ProjectBrowserDefaultTabRenderer, StatsNoneSettingsRenderer, MessageDisplaySettingsRenderer, NotesDisplaySettingsRenderer, BookmarkActionSettingsRenderer, CustomFieldsRenderer, AddCustomFieldRenderer, EditCustomFieldRenderer, EditProjectRenderer, ChangeStatusRenderer, EditListRenderer, CalendarRenderer,
+    SettingsRenderer, QuickStatsSettingsRenderer, MainMenuTabsRenderer, DeadlineSettingsRenderer, ProjectBrowserDefaultTabRenderer, StatsNoneSettingsRenderer, MessageDisplaySettingsRenderer, NotesDisplaySettingsRenderer, BookmarkActionSettingsRenderer, CustomFieldsRenderer, AddCustomFieldRenderer, EditCustomFieldRenderer, EditProjectRenderer, ChangeStatusRenderer, EditListRenderer, CalendarRenderer,
     BookmarksRenderer, AddBookmarkRenderer, EditBookmarkRenderer, BookmarkListRenderer,
     DeleteConfirmationRenderer, HelpRenderer,
     SearchRenderer
@@ -2601,7 +2601,6 @@ class LiveCLI:
             AppState.BOOKMARKS: BookmarksRenderer(self._console),
             AppState.MAIN_MENU_TABS_SETTINGS: MainMenuTabsRenderer(self._console),
             AppState.DEADLINE_SETTINGS: DeadlineSettingsRenderer(self._console),
-            AppState.TASK_METADATA_SETTINGS: TaskMetadataSettingsRenderer(self._console),
             AppState.PROJECT_BROWSER_TAB_SETTINGS: ProjectBrowserDefaultTabRenderer(self._console),
             AppState.STATS_NONE_SETTINGS: StatsNoneSettingsRenderer(self._console),
             AppState.MESSAGE_DISPLAY_SETTINGS: MessageDisplaySettingsRenderer(self._console),
