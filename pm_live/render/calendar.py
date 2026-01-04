@@ -302,7 +302,10 @@ class CalendarRenderer(BaseRenderer):
                 notes_display = self.build_inline_notes_display(
                     inline_edit_notes, inline_edit_field_index, inline_edit_notes_cursor
                 )
-                self._console.print(left_line(f"    {notes_display}"), highlight=False)
+                self._console.print(
+                    self.wrap_with_prefix(notes_display, left_line("    ")),
+                    highlight=False,
+                )
                 continue
 
             if project is not None:
@@ -355,7 +358,14 @@ class CalendarRenderer(BaseRenderer):
 
                 if show_notes:
                     from rich.markup import escape as rich_escape
-                    self._console.print(left_line(f"    [color(238)]{rich_escape(notes_value)}[/color(238)]"), highlight=False)
+                    escaped_notes = rich_escape(notes_value)
+                    self._console.print(
+                        self.wrap_with_prefix(
+                            f"[color(238)]{escaped_notes}[/color(238)]",
+                            left_line("    "),
+                        ),
+                        highlight=False,
+                    )
 
         # Add Task button (+) or Inline Editor for NEW tasks
         # Show inline editor only when adding a new task (index == len), not when editing existing task
@@ -377,7 +387,10 @@ class CalendarRenderer(BaseRenderer):
             notes_display = self.build_inline_notes_display(
                 inline_edit_notes, inline_edit_field_index, inline_edit_notes_cursor
             )
-            self._console.print(left_line(f"    {notes_display}"), highlight=False)
+            self._console.print(
+                self.wrap_with_prefix(notes_display, left_line("    ")),
+                highlight=False,
+            )
         else:
             add_selected = navigation_focus == "tasks" and task_selected_index == len(tasks_for_day)
             add_selector = "[white]›[/white] " if add_selected else "  "
@@ -470,7 +483,10 @@ class CalendarRenderer(BaseRenderer):
                 notes_display = self.build_inline_notes_display(
                     inline_edit_notes, inline_edit_field_index, inline_edit_notes_cursor
                 )
-                self._console.print(left_line(f"    {notes_display}"), highlight=False)
+                self._console.print(
+                    self.wrap_with_prefix(notes_display, left_line("    ")),
+                    highlight=False,
+                )
                 continue
             if project is not None:
                 from ..utils import get_status_icon, get_status_color
@@ -529,7 +545,14 @@ class CalendarRenderer(BaseRenderer):
 
                 if show_notes:
                     from rich.markup import escape as rich_escape
-                    self._console.print(left_line(f"    [color(238)]{rich_escape(notes_value)}[/color(238)]"), highlight=False)
+                    escaped_notes = rich_escape(notes_value)
+                    self._console.print(
+                        self.wrap_with_prefix(
+                            f"[color(238)]{escaped_notes}[/color(238)]",
+                            left_line("    "),
+                        ),
+                        highlight=False,
+                    )
         
         # Show "... and N more overdue" if truncated
         if total_overdue > count:
@@ -659,7 +682,10 @@ class CalendarRenderer(BaseRenderer):
                     notes_display = self.build_inline_notes_display(
                         inline_edit_notes, inline_edit_field_index, inline_edit_notes_cursor
                     )
-                    self._console.print(left_line(f"    {notes_display}"), highlight=False)
+                    self._console.print(
+                        self.wrap_with_prefix(notes_display, left_line("    ")),
+                        highlight=False,
+                    )
                     continue
                 if project is not None:
                     from ..utils import get_status_icon, get_status_color
@@ -729,4 +755,11 @@ class CalendarRenderer(BaseRenderer):
 
                     if show_notes:
                         from rich.markup import escape as rich_escape
-                        self._console.print(left_line(f"    [color(238)]{rich_escape(notes_value)}[/color(238)]"), highlight=False)
+                        escaped_notes = rich_escape(notes_value)
+                        self._console.print(
+                            self.wrap_with_prefix(
+                                f"[color(238)]{escaped_notes}[/color(238)]",
+                                left_line("    "),
+                            ),
+                            highlight=False,
+                        )

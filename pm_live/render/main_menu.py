@@ -324,7 +324,7 @@ class MainMenuRenderer(BaseRenderer):
                             notes_display = self.build_inline_notes_display(
                                 inline_edit_notes, inline_edit_field_index, inline_edit_notes_cursor
                             )
-                            self._console.print(left_line(f"  {notes_display}"))
+                            self._console.print(self.wrap_with_prefix(notes_display, left_line("  ")))
                             continue
 
                         project_name = None
@@ -407,7 +407,12 @@ class MainMenuRenderer(BaseRenderer):
 
                             if show_notes:
                                 escaped_notes = rich_escape(notes_value)
-                                self._console.print(left_line(f"  [color(238)]{escaped_notes}[/color(238)]"))
+                                self._console.print(
+                                    self.wrap_with_prefix(
+                                        f"[color(238)]{escaped_notes}[/color(238)]",
+                                        left_line("  "),
+                                    )
+                                )
 
                     elif item_type == "list":
                         list_name = item.get("name", "List")

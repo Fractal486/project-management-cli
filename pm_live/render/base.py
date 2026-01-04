@@ -3,7 +3,9 @@
 from abc import ABC, abstractmethod
 from io import StringIO
 from typing import Any
+import re
 import shutil
+import textwrap
 
 from rich.console import Console
 from rich.markup import escape as rich_escape
@@ -94,6 +96,38 @@ class BaseRenderer(ABC):
             self._console.print(f"[color(243)]{status_message}[/color(243)]")
 
     @staticmethod
+    def _strip_markup(text: str) -> str:
+        """Return plain text by removing Rich markup tags."""
+        if not text:
+            return ""
+        return re.sub(r"\[[^\]]+\]", "", text)
+
+    def wrap_with_prefix(self, text: str, prefix: str, width: int | None = None) -> str:
+        """Wrap text to console width and prefix every line (including wrapped lines)."""
+        if text is None:
+            return ""
+        normalized = str(text).replace("\r\n", "\n").replace("\r", "\n")
+        if width is None:
+            width = getattr(self._console, "width", 80)
+        visible_prefix = self._strip_markup(prefix)
+        available = max(1, width - len(visible_prefix))
+
+        wrapped_lines: list[str] = []
+        for raw_line in normalized.split("\n"):
+            if raw_line == "":
+                wrapped_lines.append("")
+                continue
+            lines = textwrap.wrap(
+                raw_line,
+                width=available,
+                break_long_words=False,
+                break_on_hyphens=False,
+            )
+            wrapped_lines.extend(lines if lines else [""])
+
+        return "\n".join(f"{prefix}{line}" for line in wrapped_lines)
+
+    @staticmethod
     def build_inline_name_display(name_value: str, inline_edit_field_index: int, inline_edit_name_cursor: int) -> str:
         """Render editable name with inline cursor indicator."""
         name_value = name_value or ""
@@ -138,6 +172,14 @@ class BaseRenderer(ABC):
             # Not editing notes, just display dimmed
             escaped = rich_escape(notes_value)
             return f"[color(238)]{escaped}[/color(238)]"
+
+    @staticmethod
+    def indent_multiline(text: str, prefix: str) -> str:
+        """Indent existing newline breaks by prefix without altering the first line."""
+        if not text:
+            return text
+        normalized = text.replace("\r\n", "\n").replace("\r", "\n")
+        return normalized.replace("\n", "\n" + prefix)
 
     @staticmethod
     def build_text_input_display(value: str, cursor: int) -> str:

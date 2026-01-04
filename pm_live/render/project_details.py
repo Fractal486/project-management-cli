@@ -249,7 +249,7 @@ class ProjectDetailsRenderer(BaseRenderer):
                         inline_edit_notes, inline_edit_field_index, inline_edit_notes_cursor
                     )
                     notes_indent = "  " + "    " + indent  # Align with status icon
-                    self._console.print(f"{notes_indent}{notes_display}")
+                    self._console.print(self.wrap_with_prefix(notes_display, notes_indent))
                     continue
 
                 if i == selected_index:
@@ -270,7 +270,9 @@ class ProjectDetailsRenderer(BaseRenderer):
                     if show_notes:
                         notes_indent = "  " + "    " + indent  # Align with status icon
                         escaped_notes = rich_escape(notes_value)
-                        self._console.print(f"{notes_indent}[color(238)]{escaped_notes}[/color(238)]")
+                        self._console.print(
+                            self.wrap_with_prefix(f"[color(238)]{escaped_notes}[/color(238)]", notes_indent)
+                        )
 
                 # Metadata is shown on same line with task name (see above)
 
@@ -298,7 +300,7 @@ class ProjectDetailsRenderer(BaseRenderer):
                 notes_display = self.build_inline_notes_display(
                     inline_edit_notes, inline_edit_field_index, inline_edit_notes_cursor
                 )
-                self._console.print(f"      {notes_display}")
+                self._console.print(self.wrap_with_prefix(notes_display, "      "))
             elif selected_index == add_index:
                 self._console.print(f"  [white]›[/white]   [green]+[/green] [color(245)]Add task[/color(245)]")
             else:

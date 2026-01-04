@@ -177,7 +177,7 @@ class TaskListRenderer(BaseRenderer):
                     inline_edit_notes, inline_edit_field_index, inline_edit_notes_cursor
                 )
                 notes_indent = "  " + indent  # Align with status icon
-                self._console.print(f"{notes_indent}{notes_display}")
+                self._console.print(self.wrap_with_prefix(notes_display, notes_indent))
                 return
 
             selector = "[white]›[/white] " if current_index == selected_index else "  "
@@ -195,7 +195,9 @@ class TaskListRenderer(BaseRenderer):
                 if show_notes:
                     notes_indent = "  " + indent  # Align with status icon
                     escaped_notes = rich_escape(notes_value)
-                    self._console.print(f"{notes_indent}[color(238)]{escaped_notes}[/color(238)]")
+                    self._console.print(
+                        self.wrap_with_prefix(f"[color(238)]{escaped_notes}[/color(238)]", notes_indent)
+                    )
 
             # Metadata is shown on same line with task name (see above)
 

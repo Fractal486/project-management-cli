@@ -614,7 +614,9 @@ def cmd_day(args: argparse.Namespace) -> None:
             notes = getattr(task, "notes", None)
             if notes:
                 from rich.markup import escape as rich_escape
-                console.print(f"    [color(238)]{rich_escape(notes)}[/color(238)]")
+                escaped = rich_escape(notes).replace("\r\n", "\n").replace("\r", "\n")
+                escaped = escaped.replace("\n", "\n    ")
+                console.print(f"    [color(238)]{escaped}[/color(238)]")
 
     console.print()
 
@@ -707,7 +709,9 @@ def cmd_overdue(args: argparse.Namespace) -> None:
             notes = getattr(task, "notes", None)
             if notes:
                 from rich.markup import escape as rich_escape
-                console.print(f"    [color(238)]{rich_escape(notes)}[/color(238)]")
+                escaped = rich_escape(notes).replace("\r\n", "\n").replace("\r", "\n")
+                escaped = escaped.replace("\n", "\n    ")
+                console.print(f"    [color(238)]{escaped}[/color(238)]")
 
     # Show "... and N more" if truncated
     if total_count > len(overdue_data):
@@ -840,7 +844,9 @@ def cmd_upcoming(args: argparse.Namespace) -> None:
                 notes = getattr(task, "notes", None)
                 if notes:
                     from rich.markup import escape as rich_escape
-                    console.print(f"      [color(238)]{rich_escape(notes)}[/color(238)]")
+                    escaped = rich_escape(notes).replace("\r\n", "\n").replace("\r", "\n")
+                    escaped = escaped.replace("\n", "\n      ")
+                    console.print(f"      [color(238)]{escaped}[/color(238)]")
 
     console.print()
 
