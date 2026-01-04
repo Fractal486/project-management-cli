@@ -44,8 +44,8 @@ class HelpRenderer(BaseRenderer):
         # Add footer shortcuts (skip for settings/stats screens which only have 'Back')
         settings_states = (
             AppState.SETTINGS, AppState.QUICK_STATS_SETTINGS, AppState.MAIN_MENU_TABS_SETTINGS,
-            AppState.DEADLINE_SETTINGS, AppState.TASK_METADATA_SETTINGS,
-            AppState.STATS_NONE_SETTINGS, AppState.MESSAGE_DISPLAY_SETTINGS, AppState.BOOKMARK_ACTION_SETTINGS, AppState.STATISTICS
+            AppState.DEADLINE_SETTINGS, AppState.STATS_NONE_SETTINGS,
+            AppState.MESSAGE_DISPLAY_SETTINGS, AppState.BOOKMARK_ACTION_SETTINGS, AppState.STATISTICS
         )
         if state not in settings_states:
             lines.append(f"  [yellow]{'1-4':<12}[/yellow] [color(243)]Footer actions[/color(243)]")
@@ -132,7 +132,6 @@ class HelpRenderer(BaseRenderer):
             AppState.QUICK_STATS_SETTINGS: "Quick Stats",
             AppState.MAIN_MENU_TABS_SETTINGS: "Menu Tabs",
             AppState.DEADLINE_SETTINGS: "Deadlines",
-            AppState.TASK_METADATA_SETTINGS: "Task Metadata",
             AppState.MESSAGE_DISPLAY_SETTINGS: "Status Messages",
             AppState.CUSTOMIZE_FIELDS: "Custom Fields",
             AppState.STATISTICS: "Statistics",
