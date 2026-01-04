@@ -653,6 +653,7 @@ class LiveCLI:
                     project_id = item.get("id")
                     project = self.manager.get_project(project_id)
                     if project:
+                        self.ui_state.project_browser_selected_project_id = project_id
                         self.ui_state.state = AppState.PROJECT_DETAILS
                         self.ui_state.current_project_id = project_id
                         flat_tasks = self._get_flat_tasks(project.tasks, True)
@@ -883,17 +884,12 @@ class LiveCLI:
             and self.ui_state.selected_index >= 0
             and not getattr(self.ui_state, "cell_selection_mode", False)
         ):
-            from .utils import filter_projects_by_tab, sort_projects_for_display
-            filtered = filter_projects_by_tab(self.manager.projects, self.ui_state.active_tab)
-            filtered = sort_projects_for_display(
-                filtered,
-                self.ui_state.project_sort_key,
-                self.manager.custom_field_definitions,
-                self.ui_state.project_sort_order,
-            )
+            filtered = self.key_handlers._get_filtered_projects_sorted()
             
             if self.ui_state.selected_index < len(filtered):
                 project = filtered[self.ui_state.selected_index]
+                self.ui_state.project_browser_selected_index = self.ui_state.selected_index
+                self.ui_state.project_browser_selected_project_id = project.id
                 self.ui_state.current_project_id = project.id
                 
                 self.ui_state.form_data = {

@@ -1355,7 +1355,10 @@ class EnterHandlers:
         if self.ui_state.selected_index < len(filtered):
             self._set_status(None)
             # View project details
-            self.ui_state.current_project_id = filtered[self.ui_state.selected_index].id
+            selected_project = filtered[self.ui_state.selected_index]
+            self.ui_state.project_browser_selected_index = self.ui_state.selected_index
+            self.ui_state.project_browser_selected_project_id = selected_project.id
+            self.ui_state.current_project_id = selected_project.id
             self.ui_state.state = AppState.PROJECT_DETAILS
             self.ui_state.selected_index = 0
         elif self.ui_state.selected_index == len(filtered):
@@ -1439,7 +1442,7 @@ class EnterHandlers:
             # Back to projects
             self._set_status(None)
             self.ui_state.state = AppState.PROJECT_BROWSER
-            self.ui_state.selected_index = 0
+            self._restore_project_browser_selection(self.ui_state.current_project_id)
             logger.info("Returning to project browser from project details")
 
     def handle_task_list_enter(self):
@@ -1778,7 +1781,10 @@ class EnterHandlers:
             target_state = self.ui_state.previous_state or AppState.PROJECT_DETAILS
             self.ui_state.state = target_state
             self.ui_state.previous_state = None  # Clear it
-            self.ui_state.selected_index = 0
+            if target_state == AppState.PROJECT_BROWSER:
+                self._restore_project_browser_selection(project.id)
+            else:
+                self.ui_state.selected_index = 0
             self.ui_state.form_field_index = 0
             self._set_status(None)
         elif self.ui_state.form_field_index == total_fields + 1:
@@ -1809,7 +1815,10 @@ class EnterHandlers:
             target_state = self.ui_state.previous_state or AppState.PROJECT_DETAILS
             self.ui_state.state = target_state
             self.ui_state.previous_state = None  # Clear it
-            self.ui_state.selected_index = 0
+            if target_state == AppState.PROJECT_BROWSER:
+                self._restore_project_browser_selection(project.id)
+            else:
+                self.ui_state.selected_index = 0
             self.ui_state.form_field_index = 0
             self._set_status(None)
 
@@ -3808,3 +3817,33 @@ class EnterHandlers:
             all_fields,
             getattr(self.ui_state, "project_sort_order", None),
         )
+
+    def _restore_project_browser_selection(self, fallback_project_id: Optional[int] = None) -> None:
+        """Restore the project browser selection based on last project/id."""
+        filtered = self._get_filtered_projects_sorted()
+        if not filtered:
+            self.ui_state.selected_index = 0
+            self.ui_state.project_browser_selected_index = 0
+            self.ui_state.project_browser_selected_project_id = None
+            return
+
+        project_id = fallback_project_id or self.ui_state.project_browser_selected_project_id
+        selected_index = None
+
+        if project_id is not None:
+            for idx, project in enumerate(filtered):
+                if project.id == project_id:
+                    selected_index = idx
+                    break
+
+        if selected_index is None:
+            saved_index = self.ui_state.project_browser_selected_index
+            if 0 <= saved_index < len(filtered):
+                selected_index = saved_index
+            else:
+                selected_index = min(max(saved_index, 0), len(filtered) - 1)
+            project_id = filtered[selected_index].id
+
+        self.ui_state.selected_index = selected_index
+        self.ui_state.project_browser_selected_index = selected_index
+        self.ui_state.project_browser_selected_project_id = project_id

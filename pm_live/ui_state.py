@@ -147,6 +147,9 @@ class UIState:
     # Project browser sorting
     project_sort_key: Optional[str] = None  # Column key currently used for sorting
     project_sort_order: Optional[str] = None  # 'asc', 'desc', or None (default order)
+    # Project browser selection persistence
+    project_browser_selected_index: int = 0
+    project_browser_selected_project_id: Optional[int] = None
 
     # Pinned items navigation (main menu)
     in_pinned_section: bool = False  # True when navigating pinned items on home screen

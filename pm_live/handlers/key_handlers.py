@@ -2,7 +2,7 @@
 
 import logging
 from datetime import datetime, timedelta
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
 from pm import STATUS_DISPLAY_ORDER
 
@@ -1232,7 +1232,7 @@ class KeyHandlers:
             _reset_pinned_nav()
         elif self.ui_state.state == AppState.PROJECT_DETAILS:
             self.ui_state.state = AppState.PROJECT_BROWSER
-            self.ui_state.selected_index = 0
+            self._restore_project_browser_selection(self.ui_state.current_project_id)
             _reset_pinned_nav()
         elif self.ui_state.state == AppState.TASK_LIST:
             # Done section should always reset to collapsed when leaving the task list.
@@ -1333,7 +1333,10 @@ class KeyHandlers:
             target_state = self.ui_state.previous_state or AppState.PROJECT_DETAILS
             self.ui_state.state = target_state
             self.ui_state.previous_state = None  # Clear it
-            self.ui_state.selected_index = 0
+            if target_state == AppState.PROJECT_BROWSER:
+                self._restore_project_browser_selection(self.ui_state.current_project_id)
+            else:
+                self.ui_state.selected_index = 0
             _reset_pinned_nav()
         elif self.ui_state.state == AppState.CHANGE_STATUS:
             self.ui_state.state = AppState.PROJECT_DETAILS
@@ -1813,6 +1816,36 @@ class KeyHandlers:
             all_fields,
             getattr(self.ui_state, "project_sort_order", None),
         )
+
+    def _restore_project_browser_selection(self, fallback_project_id: Optional[int] = None) -> None:
+        """Restore the project browser selection based on last project/id."""
+        filtered = self._get_filtered_projects_sorted()
+        if not filtered:
+            self.ui_state.selected_index = 0
+            self.ui_state.project_browser_selected_index = 0
+            self.ui_state.project_browser_selected_project_id = None
+            return
+
+        project_id = fallback_project_id or self.ui_state.project_browser_selected_project_id
+        selected_index = None
+
+        if project_id is not None:
+            for idx, project in enumerate(filtered):
+                if project.id == project_id:
+                    selected_index = idx
+                    break
+
+        if selected_index is None:
+            saved_index = self.ui_state.project_browser_selected_index
+            if 0 <= saved_index < len(filtered):
+                selected_index = saved_index
+            else:
+                selected_index = min(max(saved_index, 0), len(filtered) - 1)
+            project_id = filtered[selected_index].id
+
+        self.ui_state.selected_index = selected_index
+        self.ui_state.project_browser_selected_index = selected_index
+        self.ui_state.project_browser_selected_project_id = project_id
 
     def _cycle_deadline_component(self, direction: int):
         """Cycle the current deadline component value.
