@@ -730,9 +730,7 @@ class EnterHandlers:
             project_id = result.get('id')
             
             # Get sorted projects as they appear in the browser
-            active_tab = getattr(self.ui_state, 'active_tab', 0)
-            filtered_projects = filter_projects_by_tab(self.manager.projects, active_tab)
-            sorted_projects = sort_projects_for_display(filtered_projects)
+            sorted_projects = self._get_filtered_projects_sorted()
             
             # Find the project index
             project_idx = 0
@@ -741,8 +739,13 @@ class EnterHandlers:
                     project_idx = i
                     break
             
-            self.ui_state.state = AppState.PROJECT_BROWSER
-            self.ui_state.selected_index = project_idx
+            if 0 <= project_idx < len(sorted_projects):
+                self.ui_state.project_browser_selected_index = project_idx
+                self.ui_state.project_browser_selected_project_id = sorted_projects[project_idx].id
+                self.ui_state.current_project_id = sorted_projects[project_idx].id
+
+            self.ui_state.state = AppState.PROJECT_DETAILS
+            self.ui_state.selected_index = 0
             # Clear search state
             self.ui_state.search_query = ""
             self.ui_state.search_results = []
@@ -916,19 +919,24 @@ class EnterHandlers:
             self.ui_state.search_selected_index = 0
             
         elif result_type == 'bookmark_list':
-            # Jump to bookmarks screen and find bookmark list
+            # Jump to bookmark list view
             list_id = result.get('id')
 
             bookmarks = getattr(self.manager, 'bookmarks', [])
-            list_idx = 0
+            list_idx = None
 
             for i, item in enumerate(bookmarks):
                 if hasattr(item, 'id') and item.id == list_id:
                     list_idx = i
                     break
 
-            self.ui_state.state = AppState.BOOKMARKS
-            self.ui_state.selected_index = list_idx
+            if list_idx is not None:
+                self.ui_state.state = AppState.BOOKMARK_LIST
+                self.ui_state.current_list_index = list_idx
+                self.ui_state.selected_index = 0
+            else:
+                self.ui_state.state = AppState.BOOKMARKS
+                self.ui_state.selected_index = 0
             # Clear search state
             self.ui_state.search_query = ""
             self.ui_state.search_results = []
