@@ -156,22 +156,17 @@ class BaseRenderer(ABC):
             else:
                 return "[color(238)]notes[/color(238)]"
 
+        normalized = str(notes_value).replace("\r\n", "\n").replace("\r", "\n")
+
         # Show notes with cursor if actively editing this field
         if inline_edit_field_index == 3:
-            caret_pos = max(0, min(len(notes_value), inline_edit_notes_cursor))
-            if caret_pos < len(notes_value):
-                left = rich_escape(notes_value[:caret_pos])
-                current = rich_escape(notes_value[caret_pos])
-                right = rich_escape(notes_value[caret_pos + 1:])
-                return f"[white]{left}[/white][white reverse]{current}[/white reverse][white]{right}[/white]"
-            else:
-                # Cursor at end
-                escaped = rich_escape(notes_value)
-                return f"[white]{escaped}[/white][white reverse] [/white reverse]"
-        else:
-            # Not editing notes, just display dimmed
-            escaped = rich_escape(notes_value)
-            return f"[color(238)]{escaped}[/color(238)]"
+            display = BaseRenderer.build_multiline_text_input_display(normalized, inline_edit_notes_cursor)
+            lines = display.split("\n")
+            return "\n".join((f"[white]{line}[/white]" if line else "") for line in lines)
+
+        # Not editing notes, just display dimmed (line-safe markup)
+        lines = normalized.split("\n")
+        return "\n".join((f"[color(238)]{rich_escape(line)}[/color(238)]" if line else "") for line in lines)
 
     @staticmethod
     def indent_multiline(text: str, prefix: str) -> str:
@@ -191,6 +186,27 @@ class BaseRenderer(ABC):
             current = rich_escape(value[caret_pos])
             right = rich_escape(value[caret_pos + 1:])
             return f"{left}[reverse]{current}[/reverse]{right}"
+        return f"{rich_escape(value)}[reverse] [/reverse]"
+
+    @staticmethod
+    def build_multiline_text_input_display(value: str, cursor: int) -> str:
+        """Render a multiline text input buffer with reverse-highlight cursor.
+
+        If the cursor is positioned on a newline character, render a visible
+        glyph (↵) for the cursor and keep the line break.
+        """
+        value = (value or "").replace("\r\n", "\n").replace("\r", "\n")
+        caret_pos = max(0, min(len(value), cursor))
+        if value and caret_pos < len(value):
+            current_raw = value[caret_pos]
+            left = rich_escape(value[:caret_pos])
+            right = rich_escape(value[caret_pos + 1:])
+            if current_raw == "\n":
+                return f"{left}[reverse]↵[/reverse]\n{right}"
+            current = rich_escape(current_raw)
+            return f"{left}[reverse]{current}[/reverse]{right}"
+
+        # Cursor at end.
         return f"{rich_escape(value)}[reverse] [/reverse]"
 
     @staticmethod

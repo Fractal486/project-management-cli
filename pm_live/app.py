@@ -2346,6 +2346,12 @@ class LiveCLI:
             return
         self.key_handlers.on_backspace()
 
+    def on_insert_newline(self):
+        """Insert a literal newline in supported text fields."""
+        if self._input_blocked_in_help():
+            return
+        self.key_handlers.on_insert_newline()
+
     def on_paste(self, event):
         """Handle paste from clipboard (Ctrl+V)."""
         if self._input_blocked_in_help():

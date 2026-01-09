@@ -15,6 +15,7 @@ from ..utils import (
     validate_task_name,
     validate_section_name,
     sanitize_input,
+    sanitize_multiline_input,
     get_edit_project_field_keys,
     get_visible_fields_sorted,
     sort_projects_for_display,
@@ -1709,6 +1710,9 @@ class EnterHandlers:
             if "status" in self.ui_state.form_data:
                 project.status = self.ui_state.form_data["status"]
 
+            if "description" in self.ui_state.form_data:
+                project.description = sanitize_multiline_input(self.ui_state.form_data["description"])
+
             # Assign real ID and add to manager
             project.id = self.manager.next_id()
             
@@ -1765,7 +1769,7 @@ class EnterHandlers:
                 project.name = result
 
             if "description" in self.ui_state.form_data:
-                project.description = sanitize_input(self.ui_state.form_data["description"])
+                project.description = sanitize_multiline_input(self.ui_state.form_data["description"])
 
             if "status" in self.ui_state.form_data:
                 project.status = self.ui_state.form_data["status"]

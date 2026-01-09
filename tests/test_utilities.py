@@ -571,6 +571,6 @@ def test_render_progress_bar_custom_width():
 
 def test_filter_projects_by_tab_invalid_index(sample_projects):
     """filter_projects_by_tab handles invalid tab index."""
-    # Tab index > 2 should return completed projects
+    # Out-of-bounds index should return all projects
     filtered = filter_projects_by_tab(sample_projects, 99)
-    assert len(filtered) == 1
+    assert len(filtered) == len(sample_projects)

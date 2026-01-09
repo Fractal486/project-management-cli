@@ -47,7 +47,6 @@ def test_default_config_values():
     assert config.log_max_bytes == 5 * 1024 * 1024
     assert config.log_backup_count == 5
     assert config.deadline_display_mode == "relative"
-    assert config.task_metadata_position == "below"
 
 
 def test_default_theme_colors():
@@ -232,22 +231,6 @@ def test_apply_overrides_deadline_display_mode():
     assert config.deadline_display_mode == "relative"  # Unchanged
 
 
-def test_apply_overrides_task_metadata_position():
-    """Test task metadata position validation."""
-    config = Config()
-
-    # Valid values
-    _apply_overrides(config, {"task_metadata_position": "below"})
-    assert config.task_metadata_position == "below"
-
-    _apply_overrides(config, {"task_metadata_position": "next_to"})
-    assert config.task_metadata_position == "next_to"
-
-    # Invalid value should be ignored
-    _apply_overrides(config, {"task_metadata_position": "invalid"})
-    assert config.task_metadata_position == "next_to"  # Unchanged
-
-
 def test_apply_overrides_quick_stats_single_string():
     """Test quick_stats_metrics with single string value."""
     config = Config()
@@ -342,7 +325,6 @@ def test_save_config_includes_all_settings(temp_dir):
     assert "max_project_name_length" in content
     assert "enable_file_logging" in content
     assert "deadline_display_mode" in content
-    assert "task_metadata_position" in content
     assert "[theme_colors]" in content
 
 

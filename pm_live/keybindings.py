@@ -62,6 +62,11 @@ def create_key_bindings(controller) -> KeyBindings:
         """Confirm selection / Submit"""
         controller.on_enter()
 
+    @kb.add('c-j')
+    def _(event):
+        """Insert newline while editing notes/description."""
+        controller.on_insert_newline()
+
     @kb.add('escape')
     def _(event):
         """Go back or cancel"""
@@ -261,6 +266,7 @@ KEYBINDINGS_BY_SCREEN = {
         ("→/←", "Indent/Outdent task"),
         ("Ctrl+↑/↓", "Move task up/down"),
         ("m", "Move task to another project or Tasks"),
+        ("Ctrl+J", "New line (notes/description)"),
         ("c", "Collapse/Expand task"),
         ("e", "Edit task inline"),
         ("Del", "Delete selected task"),
@@ -277,6 +283,7 @@ KEYBINDINGS_BY_SCREEN = {
         ("Ctrl+↑/↓", "Move task up/down"),
         ("Ctrl+←/→", "Move task to previous/next list"),
         ("m", "Move task to a project"),
+        ("Ctrl+J", "New line (notes/description)"),
         ("a", "Add task inline"),
         ("c", "Collapse/Expand task"),
         ("e", "Edit task inline"),
@@ -367,6 +374,7 @@ KEYBINDINGS_BY_SCREEN = {
         ("Escape", "Cancel and go back / exit field edit"),
         ("Tab", "Cycle option color (single-select custom field options)"),
         ("Text input", "Type to fill fields"),
+        ("Ctrl+J", "New line (notes/description)"),
         ("Backspace", "Delete characters or clear current field"),
         ("Ctrl+V", "Paste from clipboard"),
         ("Del", "Delete item (lists/options)"),

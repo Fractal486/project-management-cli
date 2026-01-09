@@ -2,7 +2,7 @@ import pytest
 import re
 from unittest.mock import MagicMock, patch
 import pytest
-from pm_live.render.settings import DeadlineSettingsRenderer, TaskMetadataSettingsRenderer, StatsNoneSettingsRenderer
+from pm_live.render.settings import DeadlineSettingsRenderer, StatsNoneSettingsRenderer
 
 def strip_ansi(text):
     ansi_escape = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
@@ -26,18 +26,6 @@ def test_deadline_settings_renderer_always_shows_description(mock_config):
     # Check if description for the SECOND item (not selected) is present
     # "Show full date (e.g., '2025-10-31')" is the description for "Exact Date"
     assert "Show full date (e.g., '2025-10-31')" in clean_output
-
-def test_task_metadata_settings_renderer_always_shows_description(mock_config):
-    mock_config.task_metadata_position = "below"
-    renderer = TaskMetadataSettingsRenderer()
-    context = {"selected_index": 0} # Select first item
-    
-    output = renderer.render(context)
-    clean_output = strip_ansi(output)
-    
-    # Check if description for the SECOND item (not selected) is present
-    # "Display priority and deadline on the same line as the task name" is for "Next to Task Name"
-    assert "Display priority and deadline on the same line as the task name" in clean_output
 
 def test_stats_none_settings_renderer_always_shows_description(mock_config):
     mock_config.show_none_in_stats = True

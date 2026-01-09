@@ -3,7 +3,7 @@
 import pytest
 from unittest.mock import Mock, patch
 
-from pm import Project, TIMEFRAME_OPTIONS, STATUS_OPTIONS, LEVEL_OPTIONS
+from pm import Project, TIMEFRAME_OPTIONS, STATUS_OPTIONS
 from pm_live.handlers.form_handlers import FormHandlers
 from pm_live.interfaces import HandlerContext
 from pm_live.ui_state import UIState
@@ -145,7 +145,7 @@ def test_edit_form_field_description_enter_input_mode(form_handlers, mock_ui_sta
     assert mock_ui_state.text_input_buffer == ""
 
 
-@patch('pm_live.handlers.form_handlers.sanitize_input')
+@patch('pm_live.handlers.form_handlers.sanitize_multiline_input')
 def test_edit_form_field_description_save(mock_sanitize, form_handlers, mock_ui_state):
     """Saving description sanitizes and stores it."""
     mock_sanitize.return_value = "Clean description"

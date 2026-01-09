@@ -53,8 +53,8 @@ def test_escape_from_deadline_settings(key_handlers, key_handler_context):
     assert key_handler_context.ui_state.selected_index == 3
 
 def test_escape_from_task_metadata_settings(key_handlers, key_handler_context):
-    """Test escaping from Task Metadata Settings returns to Settings."""
-    key_handler_context.ui_state.state = AppState.TASK_METADATA_SETTINGS
+    """Test escaping from Project Browser Tab Settings returns to Settings."""
+    key_handler_context.ui_state.state = AppState.PROJECT_BROWSER_TAB_SETTINGS
     key_handlers.on_escape()
     assert key_handler_context.ui_state.state == AppState.SETTINGS
     assert key_handler_context.ui_state.selected_index == 4

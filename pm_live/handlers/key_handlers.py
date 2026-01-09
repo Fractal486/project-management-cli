@@ -752,6 +752,36 @@ class KeyHandlers:
             self.ui_state.text_input_cursor = cursor
             return
 
+    def on_insert_newline(self):
+        """Insert a literal newline into supported text buffers."""
+        if self.ui_state.inline_task_edit_mode and self.ui_state.inline_edit_field_index == 3:
+            self._insert_inline_notes_char("\n")
+            return
+
+        if not self.ui_state.inline_input_mode:
+            return
+
+        if self.ui_state.state not in [AppState.ADD_PROJECT, AppState.EDIT_PROJECT]:
+            return
+
+        all_fields = get_all_fields(self.manager.default_field_visibility, self.manager.custom_field_definitions)
+        field_keys = get_edit_project_field_keys(all_fields)
+        idx = self.ui_state.form_field_index
+        if not (0 <= idx < len(field_keys)):
+            return
+
+        if field_keys[idx] != "description":
+            return
+
+        buffer, cursor = TextInputBuffer.insert(
+            self.ui_state.text_input_buffer,
+            self.ui_state.text_input_cursor,
+            "\n",
+        )
+        self.ui_state.text_input_buffer = buffer
+        self.ui_state.text_input_cursor = cursor
+        return
+
     def on_backspace(self):
         """Handle backspace."""
         # Search mode - delete character from query
@@ -2257,7 +2287,7 @@ class KeyHandlers:
         if not self.ui_state.inline_input_mode:
             return
 
-        from ..utils import sanitize_input
+        from ..utils import sanitize_input, sanitize_multiline_input
 
         # Determine field key based on state and index
         field_key = None
@@ -2278,7 +2308,10 @@ class KeyHandlers:
         
         # Save if we found a key
         if field_key:
-            sanitized = sanitize_input(self.ui_state.text_input_buffer)
+            if field_key == "description":
+                sanitized = sanitize_multiline_input(self.ui_state.text_input_buffer)
+            else:
+                sanitized = sanitize_input(self.ui_state.text_input_buffer)
             self.ui_state.form_data[field_key] = sanitized
             logger.debug("Saved inline input for '%s': %s", field_key, sanitized)
 

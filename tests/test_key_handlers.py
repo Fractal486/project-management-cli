@@ -260,6 +260,33 @@ def test_on_char_appends_to_buffer(key_handlers, mock_ui_state):
     assert mock_ui_state.text_input_buffer == "hellox"
 
 
+def test_on_insert_newline_in_inline_notes(key_handlers, mock_ui_state):
+    """Ctrl+Shift+J inserts a newline into inline task notes."""
+    mock_ui_state.inline_task_edit_mode = True
+    mock_ui_state.inline_edit_field_index = 3
+    mock_ui_state.inline_edit_notes = "ab"
+    mock_ui_state.inline_edit_notes_cursor = 1
+
+    key_handlers.on_insert_newline()
+
+    assert mock_ui_state.inline_edit_notes == "a\nb"
+    assert mock_ui_state.inline_edit_notes_cursor == 2
+
+
+def test_on_insert_newline_in_project_description_buffer(key_handlers, mock_ui_state):
+    """Ctrl+Shift+J inserts a newline into project description inline buffer."""
+    mock_ui_state.state = AppState.EDIT_PROJECT
+    mock_ui_state.inline_input_mode = True
+    mock_ui_state.form_field_index = 2  # status, name, description
+    mock_ui_state.text_input_buffer = "abc"
+    mock_ui_state.text_input_cursor = 1
+
+    key_handlers.on_insert_newline()
+
+    assert mock_ui_state.text_input_buffer == "a\nbc"
+    assert mock_ui_state.text_input_cursor == 2
+
+
 def test_on_char_only_works_in_inline_mode(key_handlers, mock_ui_state):
     """Character input only works when inline_input_mode is active."""
     mock_ui_state.inline_input_mode = False

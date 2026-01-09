@@ -1,6 +1,7 @@
 """Tests for rendering modules (pm_live/render/)."""
 
 import pytest
+import re
 from unittest.mock import Mock, MagicMock, patch
 from io import StringIO
 
@@ -252,6 +253,26 @@ def test_main_menu_selection_indicator(mock_manager):
     output = renderer.render(context)
     # Selection indicator depends on terminal/font; just ensure a selector-like character exists.
     assert ("›" in output) or (">" in output)
+
+
+def test_project_details_renders_multiline_description(mock_manager, sample_project):
+    """ProjectDetailsRenderer should display multi-line descriptions without breaking output."""
+    sample_project.description = "Line 1\nLine 2"
+    mock_manager.get_project.return_value = sample_project
+
+    renderer = ProjectDetailsRenderer()
+    context = {
+        "manager": mock_manager,
+        "current_project_id": sample_project.id,
+        "selected_index": 0,
+        "collapsed_tasks": set(),
+        "status_message": None,
+        "status_is_error": False,
+    }
+    output = renderer.render(context)
+    output = re.sub(r"\x1b\[[0-9;]*m", "", output)
+    assert "Line 1" in output
+    assert "Line 2" in output
 
 
 # ==================== TaskListRenderer Tests ====================

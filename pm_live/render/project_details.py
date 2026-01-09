@@ -118,7 +118,12 @@ class ProjectDetailsRenderer(BaseRenderer):
 
         # Calculate content widths
         name_line = f"  {status_icon}  {project.name}"
-        desc_line = f"     {project.description}" if project.description else ""
+        desc_lines: list[str] = []
+        if project.description:
+            normalized_desc = str(project.description).replace("\r\n", "\n").replace("\r", "\n")
+            desc_lines = normalized_desc.split("\n")
+        desc_line = f"     {desc_lines[0]}" if desc_lines else ""
+        desc_width = max((len(f"     {line}") for line in desc_lines), default=0)
         
         bar = render_progress_bar(percentage, width=12) if total > 0 else ""
         progress_line = f"     {bar}  {completed}/{total}  ({percentage}%)" if total > 0 else "     No tasks yet"
@@ -127,8 +132,8 @@ class ProjectDetailsRenderer(BaseRenderer):
         
         # Find max width
         content_widths = [len(name_line), len(progress_line)]
-        if desc_line:
-            content_widths.append(len(desc_line))
+        if desc_width:
+            content_widths.append(desc_width)
         if fields_line:
             content_widths.append(len(fields_line))
         
@@ -150,10 +155,11 @@ class ProjectDetailsRenderer(BaseRenderer):
         print_box_line(name_plain, name_content)
         
         # Description
-        if project.description:
-            desc_content = f"     [color(243)]{project.description}[/color(243)]"
-            desc_plain = f"     {project.description}"
-            print_box_line(desc_plain, desc_content)
+        if desc_lines:
+            for line in desc_lines:
+                desc_plain = f"     {line}"
+                desc_content = f"     [color(243)]{rich_escape(line)}[/color(243)]"
+                print_box_line(desc_plain, desc_content)
         
         # Progress
         if total > 0:

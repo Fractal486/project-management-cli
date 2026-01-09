@@ -104,6 +104,7 @@ class EditProjectRenderer(BaseRenderer):
 
             # Format the display value based on field type
             wrap_value = True
+            multiline_lines: list[str] | None = None
             if field == "status":
                 status_value = value or project.status
                 status_color = get_status_color(status_value)
@@ -117,10 +118,21 @@ class EditProjectRenderer(BaseRenderer):
                 else:
                     display_value = value or project.name
             elif field == "description":
+                wrap_value = False
                 if inline_input_mode and is_selected:
-                    display_value = BaseRenderer.build_text_input_display(text_input_buffer, text_input_cursor)
+                    raw_display = BaseRenderer.build_multiline_text_input_display(text_input_buffer, text_input_cursor)
+                    multiline_lines = raw_display.split("\n")
                 else:
-                    display_value = f"[color(243)]{value}[/color(243)]" if value else "[color(238)]—[/color(238)]"
+                    raw = (value or "").replace("\r\n", "\n").replace("\r", "\n")
+                    if raw:
+                        multiline_lines = [
+                            (f"[color(243)]{line}[/color(243)]" if line else "")
+                            for line in raw.split("\n")
+                        ]
+                    else:
+                        multiline_lines = ["[color(238)]—[/color(238)]"]
+
+                display_value = multiline_lines[0] if multiline_lines else ""
             elif custom_field:
                 if custom_field.field_type == "text":
                     if inline_input_mode and is_selected:
@@ -211,6 +223,14 @@ class EditProjectRenderer(BaseRenderer):
                 else:
                     value_display = display_value
                 self._console.print(left_line(f"{selector}[color(243)]{label}[/color(243)]{required_marker}  {value_display}"))
+
+            # Render multiline description continuation lines aligned under the value column.
+            if field == "description" and multiline_lines and len(multiline_lines) > 1:
+                selector_plain = "› " if is_selected else "  "
+                required_plain = "*" if (custom_field and custom_field.required) else ""
+                continuation_prefix = left_line(" " * (len(selector_plain) + len(label) + len(required_plain) + 2))
+                for line in multiline_lines[1:]:
+                    self._console.print(f"{continuation_prefix}{line}")
 
         self._console.print(footer_line())
 

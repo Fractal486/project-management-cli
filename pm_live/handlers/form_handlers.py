@@ -5,7 +5,7 @@ import logging
 from pm import TIMEFRAME_OPTIONS, STATUS_OPTIONS
 
 from ..interfaces import HandlerContext
-from ..utils import sanitize_input, validate_project_name
+from ..utils import sanitize_input, sanitize_multiline_input, validate_project_name
 from ..custom_fields import FIELD_TYPE_SINGLE_SELECT, get_all_fields, get_field_by_key
 
 logger = logging.getLogger(__name__)
@@ -56,7 +56,7 @@ class FormHandlers:
         elif field_name == "description":
             # Use inline editing for description (optional field)
             if self.ui_state.inline_input_mode:
-                sanitized = sanitize_input(self.ui_state.text_input_buffer)
+                sanitized = sanitize_multiline_input(self.ui_state.text_input_buffer)
                 self.ui_state.form_data["description"] = sanitized
                 self.ui_state.inline_input_mode = False
                 self.ui_state.text_input_buffer = ""

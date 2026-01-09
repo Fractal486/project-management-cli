@@ -3,6 +3,7 @@ import pytest
 from pm_live.utils.validation import (
     get_max_name_length,
     sanitize_input,
+    sanitize_multiline_input,
     validate_project_name,
     validate_task_name,
 )
@@ -12,6 +13,12 @@ def test_sanitize_input_normalizes_whitespace_and_quotes():
     raw = '  \tNew\nProject "Name" \\Extra '
     sanitized = sanitize_input(raw)
     assert sanitized == "New Project 'Name' /Extra"
+
+
+def test_sanitize_multiline_input_preserves_newlines():
+    raw = 'Line 1\r\nLine 2\t"Name" \\Extra\n'
+    sanitized = sanitize_multiline_input(raw)
+    assert sanitized == "Line 1\nLine 2 'Name' /Extra"
 
 
 @pytest.mark.parametrize(
