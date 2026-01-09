@@ -484,6 +484,8 @@ class EnterHandlers:
             self.ui_state.selected_index = 0
         elif self.ui_state.state == AppState.SEARCH:
             self.handle_search_enter()
+        elif self.ui_state.state == AppState.PROJECT_SELECTION_MENU:
+            self.handle_project_selection_enter()
         elif self.ui_state.state == AppState.CALENDAR:
             # If in inline edit mode, save changes
             if self.ui_state.inline_task_edit_mode:
@@ -3855,3 +3857,146 @@ class EnterHandlers:
         self.ui_state.selected_index = selected_index
         self.ui_state.project_browser_selected_index = selected_index
         self.ui_state.project_browser_selected_project_id = project_id
+
+    def handle_project_selection_enter(self):
+        """Handle Enter in project selection menu to move task to selected project or Tasks."""
+        move_task_source = self.ui_state.move_task_source
+        if not move_task_source:
+            # No task source, go back
+            self.ui_state.state = self.ui_state.previous_state or AppState.MAIN_MENU
+            return
+        previous_state = self.ui_state.previous_state or AppState.MAIN_MENU
+
+        projects = self.manager.projects if self.manager else []
+        selected_idx = self.ui_state.selected_index
+        task = move_task_source.get("task")
+
+        if not task:
+            self._set_status("Task not found", is_error=True)
+            self._clear_move_task_state()
+            self.ui_state.state = previous_state
+            return
+
+        # Check if moving from a project (to allow "Move to Tasks" option)
+        source_project_id = move_task_source.get("project_id")
+        is_from_project = source_project_id is not None
+
+        # Check if "Move to Tasks" option is selected
+        tasks_option_index = len(projects)
+        is_move_to_tasks = is_from_project and selected_idx == tasks_option_index
+
+        # Validate selection index (but allow tasks_option_index if from project)
+        if not is_move_to_tasks and (selected_idx < 0 or selected_idx >= len(projects)):
+            self._set_status("Invalid selection", is_error=True)
+            self._clear_move_task_state()
+            self.ui_state.state = previous_state
+            return
+
+        # Check if trying to move task to the same project it's already in
+        if not is_move_to_tasks and is_from_project:
+            target_project = projects[selected_idx]
+            if target_project.id == source_project_id:
+                self._set_status("Task is already in this project", is_error=True)
+                self._clear_move_task_state()
+                self.ui_state.state = previous_state
+                return
+
+        if is_move_to_tasks:
+            # Move task to standalone Tasks list
+            source_project = self.manager.get_project(source_project_id)
+            if source_project:
+                try:
+                    source_project.tasks.remove(task)
+                    self.manager.update_project(source_project)
+                except ValueError:
+                    pass
+
+            # Add to Tasks list
+            list_tasks_map = getattr(self.ui_state, "list_tasks", None) or getattr(self.manager, "list_tasks", {})
+            sections = list_tasks_map.get("Tasks", [])
+            if not sections:
+                sections = [Section(name="", tasks=[])]
+                list_tasks_map["Tasks"] = sections
+
+            # Add to first section
+            section = sections[0]
+            section_tasks = section.tasks if hasattr(section, "tasks") else section.get("tasks", [])
+            section_tasks.append(task)
+
+            self.manager.mark_list_tasks_modified()
+            self.manager.save()
+
+            self._set_status("Task moved to Tasks")
+            # Navigate to the Tasks list so user can see the moved task
+            self.ui_state.state = AppState.TASK_LIST
+            # Set active tab to Tasks (index 0 is typically the Tasks list)
+            task_lists = getattr(self.ui_state, "task_lists", ["Tasks"])
+            try:
+                tasks_tab_idx = task_lists.index("Tasks")
+                self.ui_state.active_tab = tasks_tab_idx
+            except ValueError:
+                self.ui_state.active_tab = 0
+            self.ui_state.selected_index = 0
+        else:
+            # Move to selected project
+            target_project = projects[selected_idx]
+
+            # Remove task from source
+            source_list_name = move_task_source.get("list_name")
+            source_section_idx = move_task_source.get("section_idx")
+
+            if source_project_id is not None:
+                # Task is from a project
+                source_project = self.manager.get_project(source_project_id)
+                if source_project:
+                    try:
+                        source_project.tasks.remove(task)
+                        self.manager.update_project(source_project)
+                    except ValueError:
+                        # Task not found in source project, continue anyway
+                        pass
+            elif source_list_name is not None:
+                # Task is from a standalone list
+                list_tasks_map = getattr(self.ui_state, "list_tasks", None) or getattr(self.manager, "list_tasks", {})
+                sections = list_tasks_map.get(source_list_name, [])
+                if source_section_idx is not None and 0 <= source_section_idx < len(sections):
+                    section = sections[source_section_idx]
+                    section_tasks = section.tasks if hasattr(section, "tasks") else section.get("tasks", [])
+                    try:
+                        section_tasks.remove(task)
+                        self.manager.mark_list_tasks_modified()
+                        self.manager.save()
+                    except ValueError:
+                        # Task not found, continue anyway
+                        pass
+
+            # Add task to target project
+            target_project.tasks.append(task)
+            self.manager.update_project(target_project)
+
+            # Show success message
+            self._set_status(f"Task moved to project: {target_project.name}")
+
+            # Return to previous state
+            if previous_state == AppState.PROJECT_DETAILS:
+                # If we were in project details, go to the target project
+                self.ui_state.state = AppState.PROJECT_DETAILS
+                self.ui_state.current_project_id = target_project.id
+                self.ui_state.selected_index = 0
+            elif previous_state == AppState.TASK_LIST:
+                # Return to task list
+                self.ui_state.state = AppState.TASK_LIST
+                self.ui_state.selected_index = 0
+            else:
+                self.ui_state.state = AppState.MAIN_MENU
+                self.ui_state.selected_index = 0
+
+        # Clear move task state
+        self._clear_move_task_state()
+
+    def _clear_move_task_state(self):
+        """Clear the move task state variables."""
+        self.ui_state.move_task_source = None
+        self.ui_state.move_task_target_project_idx = 0
+        self.ui_state.move_task_original_index = 0
+        self.ui_state.previous_state = None

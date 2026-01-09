@@ -39,3 +39,4 @@ class AppState(Enum):
     EDIT_BOOKMARK = "edit_bookmark"
     EDIT_TAB = "edit_tab"
     DELETE_CONFIRMATION = "delete_confirmation"
+    PROJECT_SELECTION_MENU = "project_selection_menu"

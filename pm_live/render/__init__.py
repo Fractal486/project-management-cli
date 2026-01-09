@@ -12,6 +12,7 @@ from .forms import EditProjectRenderer, ChangeStatusRenderer, DeleteConfirmation
 from .bookmarks import BookmarksRenderer, AddBookmarkRenderer, EditBookmarkRenderer, BookmarkListRenderer
 from .help import HelpRenderer
 from .search import SearchRenderer
+from .project_selection import ProjectSelectionRenderer
 
 __all__ = [
     'BaseRenderer', 'rich_to_formatted_text',
@@ -19,5 +20,5 @@ __all__ = [
     'TaskListRenderer', 'StatisticsRenderer', 'CalendarRenderer', 'SettingsRenderer', 'QuickStatsSettingsRenderer', 'MainMenuTabsRenderer', 'DeadlineSettingsRenderer', 'ProjectBrowserDefaultTabRenderer', 'StatsNoneSettingsRenderer', 'MessageDisplaySettingsRenderer', 'NotesDisplaySettingsRenderer', 'BookmarkActionSettingsRenderer', 'CustomFieldsRenderer',
     'EditProjectRenderer', 'ChangeStatusRenderer', 'DeleteConfirmationRenderer', 'EditListRenderer', 'AddCustomFieldRenderer', 'EditCustomFieldRenderer', 'AddProjectRenderer',
     'BookmarksRenderer', 'AddBookmarkRenderer', 'EditBookmarkRenderer', 'BookmarkListRenderer',
-    'HelpRenderer', 'SearchRenderer'
+    'HelpRenderer', 'SearchRenderer', 'ProjectSelectionRenderer'
 ]

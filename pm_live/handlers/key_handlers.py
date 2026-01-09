@@ -50,6 +50,12 @@ class KeyHandlers:
                 self.ui_state.search_selected_index -= 1
             return
 
+        # Navigate project selection menu
+        if self.ui_state.state == AppState.PROJECT_SELECTION_MENU:
+            if self.ui_state.selected_index > 0:
+                self.ui_state.selected_index -= 1
+            return
+
         if self.ui_state.state == AppState.CALENDAR:
             # If in inline edit mode, let the inline edit handlers below handle it
             if not self.ui_state.inline_task_edit_mode:
@@ -179,6 +185,23 @@ class KeyHandlers:
             max_index = max(0, len(self.ui_state.search_results) - 1)
             if self.ui_state.search_selected_index < max_index:
                 self.ui_state.search_selected_index += 1
+            return
+
+        # Navigate project selection menu
+        if self.ui_state.state == AppState.PROJECT_SELECTION_MENU:
+            projects = self.manager.projects if self.manager else []
+            
+            # Check if "Move to Tasks" option is available
+            move_task_source = self.ui_state.move_task_source
+            is_from_project = move_task_source and move_task_source.get("project_id") is not None
+            
+            # Max index includes the "Move to Tasks" option if moving from a project
+            max_index = len(projects) - 1
+            if is_from_project:
+                max_index = len(projects)  # Include the Tasks option
+            
+            if self.ui_state.selected_index < max_index:
+                self.ui_state.selected_index += 1
             return
 
         if self.ui_state.state == AppState.CALENDAR:
@@ -1254,6 +1277,24 @@ class KeyHandlers:
             self.ui_state.search_results = []
             self.ui_state.search_selected_index = 0
             self.ui_state.selected_index = 0
+        elif self.ui_state.state == AppState.PROJECT_SELECTION_MENU:
+            # Cancel project selection and return to previous state
+            previous_state = self.ui_state.previous_state
+            original_index = self.ui_state.move_task_original_index
+            
+            if previous_state and previous_state != AppState.PROJECT_SELECTION_MENU:
+                self.ui_state.state = previous_state
+                self.ui_state.previous_state = None
+                self.ui_state.selected_index = original_index  # Restore original index
+            else:
+                self.ui_state.state = AppState.MAIN_MENU
+                self.ui_state.selected_index = 0
+            
+            # Clear move task state
+            self.ui_state.move_task_source = None
+            self.ui_state.move_task_target_project_idx = 0
+            self.ui_state.move_task_original_index = 0
+            _reset_pinned_nav()
         elif self.ui_state.state == AppState.CALENDAR:
             # If in inline edit mode, cancel editing
             if self.ui_state.inline_task_edit_mode:

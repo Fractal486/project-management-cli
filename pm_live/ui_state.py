@@ -155,3 +155,8 @@ class UIState:
     in_pinned_section: bool = False  # True when navigating pinned items on home screen
     pinned_selected_index: int = 0   # Index within pinned items list
     reordered_pinned_items: List = field(default_factory=list)  # Display order: projects, tasks, bookmarks, lists, sections
+
+    # Move task to project feature
+    move_task_source: Optional[dict] = None  # {"task": Task, "task_id": str, "list_name": str, "section_idx": int, "project_id": int}
+    move_task_target_project_idx: int = 0  # Selected project index in project selection menu
+    move_task_original_index: int = 0  # Original selected_index before entering project selection menu

@@ -35,7 +35,7 @@ from .render import (
     SettingsRenderer, QuickStatsSettingsRenderer, MainMenuTabsRenderer, DeadlineSettingsRenderer, ProjectBrowserDefaultTabRenderer, StatsNoneSettingsRenderer, MessageDisplaySettingsRenderer, NotesDisplaySettingsRenderer, BookmarkActionSettingsRenderer, CustomFieldsRenderer, AddCustomFieldRenderer, EditCustomFieldRenderer, EditProjectRenderer, ChangeStatusRenderer, EditListRenderer, CalendarRenderer,
     BookmarksRenderer, AddBookmarkRenderer, EditBookmarkRenderer, BookmarkListRenderer,
     DeleteConfirmationRenderer, HelpRenderer,
-    SearchRenderer
+    SearchRenderer, ProjectSelectionRenderer
 )
 from .tasks import flatten_tasks
 from .handlers import KeyHandlers, EnterHandlers, TaskHandlers, BookmarkHandlers
@@ -489,6 +489,8 @@ class LiveCLI:
             'search_query': self.ui_state.search_query,
             'search_results': self.ui_state.search_results,
             'search_selected_index': self.ui_state.search_selected_index,
+            # Move task to project
+            'move_task_source': self.ui_state.move_task_source,
             # Pass ui_state itself for renderers that need to update it
             'ui_state': self.ui_state,
         }
@@ -2034,6 +2036,57 @@ class LiveCLI:
             if self.ui_state.state == AppState.TASK_LIST:
                 self.task_handlers.handle_task_move_right()
 
+    def on_move_to_project(self):
+        """Handle Ctrl+M key to move task to a project."""
+        if self._input_blocked_in_help():
+            return
+        
+        # Only allow in PROJECT_DETAILS or TASK_LIST states
+        if self.ui_state.state not in (AppState.PROJECT_DETAILS, AppState.TASK_LIST):
+            return
+        
+        # Get selected task
+        selected_flat = self.task_handlers._get_selected_flat_task()
+        if not selected_flat:
+            return
+        
+        task_id, task, _ = selected_flat
+        
+        # Store source information
+        source_info = {
+            "task": task,
+            "task_id": task_id,
+            "list_name": None,
+            "section_idx": None,
+            "project_id": None,
+        }
+        
+        if self.ui_state.state == AppState.TASK_LIST:
+            # Task is in a standalone list
+            task_lists = getattr(self.ui_state, "task_lists", ["Tasks"])
+            active_tab = getattr(self.ui_state, "active_tab", 0)
+            source_info["list_name"] = task_lists[active_tab] if 0 <= active_tab < len(task_lists) else "Tasks"
+            
+            # Find the section index
+            list_tasks_map = getattr(self.ui_state, "list_tasks", None) or getattr(self.manager, "list_tasks", {})
+            sections = list_tasks_map.get(source_info["list_name"], [])
+            for idx, section in enumerate(sections):
+                section_tasks = section.tasks if hasattr(section, "tasks") else section.get("tasks", [])
+                if task in section_tasks:
+                    source_info["section_idx"] = idx
+                    break
+        else:
+            # Task is in a project
+            source_info["project_id"] = self.ui_state.current_project_id
+        
+        # Save current state and selection
+        self.ui_state.move_task_source = source_info
+        self.ui_state.move_task_target_project_idx = 0
+        self.ui_state.move_task_original_index = self.ui_state.selected_index
+        self.ui_state.previous_state = self.ui_state.state
+        self.ui_state.state = AppState.PROJECT_SELECTION_MENU
+        self.ui_state.selected_index = 0
+
     def _handle_project_move_up(self):
         """Move selected project up in the list (manual reordering)."""
         # Disable manual reordering if sorting is active
@@ -2613,6 +2666,7 @@ class LiveCLI:
             AppState.EDIT_BOOKMARK: EditBookmarkRenderer(self._console),
             AppState.EDIT_TAB: EditListRenderer(self._console),
             AppState.DELETE_CONFIRMATION: DeleteConfirmationRenderer(self._console),
+            AppState.PROJECT_SELECTION_MENU: ProjectSelectionRenderer(self._console),
         }
         # Help overlay renderer (not tied to a specific state)
         self.help_renderer = HelpRenderer(self._console)

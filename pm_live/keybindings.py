@@ -160,6 +160,14 @@ def create_key_bindings(controller) -> KeyBindings:
         else:
             controller.on_goto()
 
+    @kb.add('m')
+    def _(event):
+        """Move task to project."""
+        if _in_text_mode():
+            controller.on_char('m')
+        else:
+            controller.on_move_to_project()
+
     @kb.add('/')
     def _(event):
         """Open global search."""
@@ -183,8 +191,8 @@ def create_key_bindings(controller) -> KeyBindings:
     # Handle text input for inline editing mode
     # Lowercase 'c', 'h' and uppercase 'C' have special handling via dedicated keybindings
     # They will trigger collapse/help when NOT in inline input mode, or add the character when in inline mode
-    # Note: 'c', 'e', 'a', 'p', 't', 'g', and '/' are excluded here since they have dedicated keybindings above
-    printable_chars = 'bdfhijklmnoqrsuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0 .,!?-_()[]{}:;\\@#$%^&*+=~`"\' '
+    # Note: 'c', 'e', 'a', 'p', 't', 'g', 'm', and '/' are excluded here since they have dedicated keybindings above
+    printable_chars = 'bdfhijklnoqrsuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0 .,!?-_()[]{}:;\\@#$%^&*+=~`"\' '
     for char in printable_chars:
         @kb.add(char)
         def _handler(event, c=char):
@@ -252,20 +260,7 @@ KEYBINDINGS_BY_SCREEN = {
         ("↑/↓", "Navigate tasks/actions"),
         ("→/←", "Indent/Outdent task"),
         ("Ctrl+↑/↓", "Move task up/down"),
-        ("c", "Collapse/Expand task"),
-        ("e", "Edit task inline"),
-        ("Del", "Delete selected task"),
-        ("p", "Pin/Unpin task or section"),
-        ("Enter", "Select/Confirm action"),
-        ("Escape", "Back to project browser"),
-        ("h", "Toggle keyboard shortcuts help"),
-        ("Ctrl+C", "Exit application"),
-    ],
-    AppState.TASK_LIST: [
-        ("↑/↓", "Navigate tasks/actions"),
-        ("→/←", "Indent/Outdent task"),
-        ("Ctrl+↑/↓", "Move task up/down"),
-        ("a", "Add task inline"),
+        ("m", "Move task to another project or Tasks"),
         ("c", "Collapse/Expand task"),
         ("e", "Edit task inline"),
         ("Del", "Delete selected task"),
@@ -281,6 +276,7 @@ KEYBINDINGS_BY_SCREEN = {
         ("→/←", "Indent/Outdent task"),
         ("Ctrl+↑/↓", "Move task up/down"),
         ("Ctrl+←/→", "Move task to previous/next list"),
+        ("m", "Move task to a project"),
         ("a", "Add task inline"),
         ("c", "Collapse/Expand task"),
         ("e", "Edit task inline"),
@@ -352,6 +348,13 @@ KEYBINDINGS_BY_SCREEN = {
         ("e", "Edit task inline (task list)"),
         ("Del", "Delete task (task list)"),
         ("Escape", "Cancel inline edit / Back to main menu"),
+        ("h", "Toggle keyboard shortcuts help"),
+        ("Ctrl+C", "Exit application"),
+    ],
+    AppState.PROJECT_SELECTION_MENU: [
+        ("↑/↓", "Navigate projects"),
+        ("Enter", "Move task to selected project"),
+        ("Escape", "Cancel and go back"),
         ("h", "Toggle keyboard shortcuts help"),
         ("Ctrl+C", "Exit application"),
     ],
