@@ -2673,6 +2673,13 @@ class EnterHandlers:
             if active_tab >= len(self.ui_state.task_lists):
                 self.ui_state.active_tab = max(0, len(self.ui_state.task_lists) - 1)
 
+            # Reset quick-add target if it pointed to the deleted list.
+            if getattr(self.ui_state, "quick_add_list", None) == list_name:
+                remaining = getattr(self.ui_state, "task_lists", []) or []
+                self.ui_state.quick_add_list = (
+                    "Tasks" if "Tasks" in remaining else (remaining[0] if remaining else "Tasks")
+                )
+
             # Invalidate caches
             self._invalidate_task_cache()
 

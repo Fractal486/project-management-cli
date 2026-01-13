@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import copy
+import json
 import os
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -186,6 +187,9 @@ def save_config(config: Config, base_path: Optional[Path] = None) -> None:
     base = base_path or Path.cwd()
     file_path = base / CONFIG_FILE_NAME
 
+    def _toml_string_list(values: list[str]) -> str:
+        return "[" + ", ".join(json.dumps(str(v)) for v in values) + "]"
+
     # Build TOML content from config
     toml_content = f"""# Project Manager CLI Configuration
 #
@@ -222,6 +226,14 @@ notes_display_mode = "{config.notes_display_mode}"
 # Project Browser Default Tab
 # Options: "all" (All tab first) | "active" (Active tab first)
 project_browser_default_tab = "{config.project_browser_default_tab}"
+
+# Quick Stats Metrics
+# Options: "uncompleted_projects", "uncompleted_tasks", "bookmarks"
+quick_stats_metrics = {_toml_string_list(config.quick_stats_metrics)}
+
+# Main Menu Tabs
+# Options: "projects", "tasks", "bookmarks", "calendar"
+main_menu_tabs = {_toml_string_list(config.main_menu_tabs)}
 
 [theme_colors]
 """

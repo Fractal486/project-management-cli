@@ -8,7 +8,9 @@ import shutil
 import textwrap
 
 from rich.console import Console
+from rich.markup import MarkupError
 from rich.markup import escape as rich_escape
+from rich.text import Text
 from prompt_toolkit.formatted_text import FormattedText, ANSI
 
 from ..config import get_config
@@ -102,30 +104,64 @@ class BaseRenderer(ABC):
             return ""
         return re.sub(r"\[[^\]]+\]", "", text)
 
-    def wrap_with_prefix(self, text: str, prefix: str, width: int | None = None) -> str:
-        """Wrap text to console width and prefix every line (including wrapped lines)."""
+    def wrap_with_prefix(self, text: str, prefix: str, width: int | None = None) -> Text:
+        """Wrap text to console width and prefix every line (including wrapped lines).
+
+        Returns a Rich Text renderable so markup styles remain valid across line breaks.
+        """
         if text is None:
-            return ""
+            return Text("")
         normalized = str(text).replace("\r\n", "\n").replace("\r", "\n")
         if width is None:
             width = getattr(self._console, "width", 80)
         visible_prefix = self._strip_markup(prefix)
         available = max(1, width - len(visible_prefix))
 
-        wrapped_lines: list[str] = []
+        try:
+            prefix_text = Text.from_markup(prefix)
+        except MarkupError:
+            prefix_text = Text(prefix)
+
+        output_lines: list[Text] = []
         for raw_line in normalized.split("\n"):
             if raw_line == "":
-                wrapped_lines.append("")
+                output_lines.append(prefix_text.copy())
                 continue
+
+            try:
+                rich_text = Text.from_markup(raw_line)
+                wrapped = rich_text.wrap(self._console, available)
+                if not wrapped:
+                    wrapped = [Text("")]
+
+                for line in wrapped:
+                    prefixed = prefix_text.copy()
+                    prefixed.append_text(line)
+                    output_lines.append(prefixed)
+                continue
+            except MarkupError:
+                pass
+
             lines = textwrap.wrap(
                 raw_line,
                 width=available,
                 break_long_words=False,
                 break_on_hyphens=False,
             )
-            wrapped_lines.extend(lines if lines else [""])
+            if not lines:
+                lines = [""]
 
-        return "\n".join(f"{prefix}{line}" for line in wrapped_lines)
+            for line in lines:
+                prefixed = prefix_text.copy()
+                prefixed.append(line)
+                output_lines.append(prefixed)
+
+        result = Text("")
+        for i, line in enumerate(output_lines):
+            result.append_text(line)
+            if i != len(output_lines) - 1:
+                result.append("\n")
+        return result
 
     @staticmethod
     def build_inline_name_display(name_value: str, inline_edit_field_index: int, inline_edit_name_cursor: int) -> str:

@@ -325,6 +325,8 @@ def test_save_config_includes_all_settings(temp_dir):
     assert "max_project_name_length" in content
     assert "enable_file_logging" in content
     assert "deadline_display_mode" in content
+    assert "quick_stats_metrics" in content
+    assert "main_menu_tabs" in content
     assert "[theme_colors]" in content
 
 
@@ -351,6 +353,8 @@ def test_save_and_reload_config(temp_dir, clean_env):
     config.max_project_name_length = 250
     config.theme_colors["primary"] = "blue"
     config.deadline_display_mode = "date"
+    config.quick_stats_metrics = ["uncompleted_projects", "bookmarks"]
+    config.main_menu_tabs = ["projects", "tasks", "bookmarks"]
 
     save_config(config, temp_dir)
 
@@ -361,6 +365,8 @@ def test_save_and_reload_config(temp_dir, clean_env):
     assert loaded.max_project_name_length == 250
     assert loaded.theme_colors["primary"] == "blue"
     assert loaded.deadline_display_mode == "date"
+    assert loaded.quick_stats_metrics == ["uncompleted_projects", "bookmarks"]
+    assert loaded.main_menu_tabs == ["projects", "tasks", "bookmarks"]
 
 
 # ==================== Error Handling Tests ====================

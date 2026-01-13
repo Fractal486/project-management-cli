@@ -40,7 +40,9 @@ def perform_search(manager, query: str) -> List[Dict[str, Any]]:
             continue
 
         # Search custom fields (all types converted to string)
-        custom_fields = getattr(project, 'custom_fields', {})
+        custom_fields = getattr(project, 'custom_field_values', None)
+        if custom_fields is None:
+            custom_fields = getattr(project, 'custom_fields', {})
         if custom_fields:
             for field_key, field_value in custom_fields.items():
                 if field_value is not None:

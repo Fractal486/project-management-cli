@@ -260,6 +260,47 @@ def test_on_char_appends_to_buffer(key_handlers, mock_ui_state):
     assert mock_ui_state.text_input_buffer == "hellox"
 
 
+def test_get_max_index_task_list_legacy_list_format_does_not_crash(mock_task_handlers, mock_enter_handlers):
+    # Build a KeyHandlers instance with a real get_flat_tasks implementation.
+    manager = Mock()
+    manager.projects = []
+    manager.bookmarks = []
+    manager.custom_field_definitions = []
+    manager.default_field_visibility = {}
+    manager.force_save = Mock(return_value=True)
+    manager.get_project = Mock()
+    manager.standalone_tasks = []
+    manager.list_metadata = {"Tasks": {"show_done_section": "section"}}
+
+    ui_state = UIState()
+    ui_state.state = AppState.TASK_LIST
+    ui_state.task_lists = ["Tasks"]
+    ui_state.active_tab = 0
+    ui_state.collapsed_tasks = set()
+    ui_state.list_tasks = {
+        # Legacy format: list directly contains Task objects
+        "Tasks": [Task(name="T1", completed=None)],
+    }
+
+    def _get_flat_tasks(tasks, _is_project: bool):
+        from pm_live.tasks import flatten_tasks
+
+        result = []
+        flatten_tasks(list(tasks), result, 0, set())
+        return result
+
+    ctx = Mock(spec=HandlerContext)
+    ctx.manager = manager
+    ctx.ui_state = ui_state
+    ctx.get_flat_tasks = _get_flat_tasks
+    ctx.invalidate_task_cache = Mock()
+    ctx.exit_application = Mock()
+
+    handlers = KeyHandlers(ctx, mock_task_handlers, mock_enter_handlers)
+
+    assert handlers._get_max_index() == 4
+
+
 def test_on_insert_newline_in_inline_notes(key_handlers, mock_ui_state):
     """Ctrl+Shift+J inserts a newline into inline task notes."""
     mock_ui_state.inline_task_edit_mode = True

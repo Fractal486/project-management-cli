@@ -1508,11 +1508,11 @@ class KeyHandlers:
                 if done_mode in ["section", "bottom"]:
                     pending = [t for t in all_flat_tasks if t[1].completed is None]
                     completed = [t for t in all_flat_tasks if t[1].completed is not None]
-                    section_data.append(("", pending, completed))
+                    section_data.append((None, "", pending, completed))
                     all_pending_tasks.extend(pending)
                     all_completed_tasks.extend(completed)
                 else:  # "inline"
-                    section_data.append(("", all_flat_tasks, []))
+                    section_data.append((None, "", all_flat_tasks, []))
                     all_pending_tasks.extend(all_flat_tasks)
             else:
                 # New format: list of sections

@@ -156,7 +156,7 @@ class FormHandlers:
                 if field_name in self.ui_state.form_data:
                     current_value = self.ui_state.form_data.get(field_name)
                 elif not is_add_form and project:
-                    current_value = project.custom_field_values.get(field_name, getattr(project, field_name, None))
+                    current_value = project.custom_field_values.get(field_name, None)
                 else:
                     current_value = None
 
@@ -194,7 +194,7 @@ class FormHandlers:
                         current_val = self.ui_state.form_data.get(field_name, "")
                     else:
                         if project:
-                            current_val = project.custom_field_values.get(field_name, getattr(project, field_name, ""))
+                            current_val = project.custom_field_values.get(field_name, "")
                         else:
                             current_val = self.ui_state.form_data.get(field_name, "")
                     
@@ -225,7 +225,7 @@ class FormHandlers:
                         self.ui_state.text_input_buffer = self.ui_state.form_data.get(field_name, "")
                     else:
                         if project:
-                            default_value = project.custom_field_values.get(field_name, getattr(project, field_name, ""))
+                            default_value = project.custom_field_values.get(field_name, "")
                         else:
                             default_value = self.ui_state.form_data.get(field_name, "")
                         self.ui_state.text_input_buffer = str(default_value) if default_value is not None else ""

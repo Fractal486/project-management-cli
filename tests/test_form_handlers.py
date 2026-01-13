@@ -4,6 +4,7 @@ import pytest
 from unittest.mock import Mock, patch
 
 from pm import Project, TIMEFRAME_OPTIONS, STATUS_OPTIONS
+from pm_live.custom_fields import CustomField, SelectOption, FIELD_TYPE_DATE, FIELD_TYPE_SINGLE_SELECT
 from pm_live.handlers.form_handlers import FormHandlers
 from pm_live.interfaces import HandlerContext
 from pm_live.ui_state import UIState
@@ -21,6 +22,8 @@ def mock_manager():
     manager.mark_dirty = Mock()
     manager.save = Mock(return_value=True)
     manager.next_id = Mock(return_value=1)
+    manager.default_field_visibility = {}
+    manager.custom_field_definitions = []
     return manager
 
 
@@ -64,6 +67,53 @@ def sample_project():
          description="Sample description",
          tasks=[]
      )
+
+
+def test_edit_form_field_custom_date_key_collision_uses_today_default(form_handlers, mock_ui_state):
+    manager = form_handlers.manager
+    manager.custom_field_definitions = [
+        CustomField(key="id", label="ID", field_type=FIELD_TYPE_DATE, order=50)
+    ]
+    project = Project(id=42, name="P", status="Planned", tasks=[], custom_field_values={})
+
+    form_handlers.edit_form_field("id", is_add_form=False, project=project)
+
+    assert mock_ui_state.custom_field_date_edit_mode is True
+    assert isinstance(mock_ui_state.custom_field_date_buffer, str)
+    assert mock_ui_state.custom_field_date_buffer != "42"
+    assert len(mock_ui_state.custom_field_date_buffer) == 10
+    assert "-" in mock_ui_state.custom_field_date_buffer
+
+
+def test_edit_form_field_custom_text_key_collision_defaults_empty(form_handlers, mock_ui_state):
+    manager = form_handlers.manager
+    manager.custom_field_definitions = [
+        CustomField(key="id", label="ID", field_type="text", order=50)
+    ]
+    project = Project(id=42, name="P", status="Planned", tasks=[], custom_field_values={})
+
+    form_handlers.edit_form_field("id", is_add_form=False, project=project)
+
+    assert mock_ui_state.inline_input_mode is True
+    assert mock_ui_state.text_input_buffer == ""
+
+
+def test_edit_form_field_custom_single_select_key_collision_cycles_to_first_option(form_handlers, mock_ui_state):
+    manager = form_handlers.manager
+    manager.custom_field_definitions = [
+        CustomField(
+            key="id",
+            label="ID",
+            field_type=FIELD_TYPE_SINGLE_SELECT,
+            order=50,
+            select_options=[SelectOption(value="A"), SelectOption(value="B")],
+        )
+    ]
+    project = Project(id=42, name="P", status="Planned", tasks=[], custom_field_values={})
+
+    form_handlers.edit_form_field("id", is_add_form=False, project=project)
+
+    assert mock_ui_state.form_data["id"] == "A"
 
 
 # ==================== Name Field Tests ====================

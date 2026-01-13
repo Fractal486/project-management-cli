@@ -1506,6 +1506,11 @@ class ProjectManager:
                 if self._items_match(item_type, item, item_id):
                     continue  # Skip this item (remove it)
 
+                # If no partial match criteria provided, don't treat this as a wildcard.
+                if list_name is None and section_idx is None:
+                    new_pinned.append(item)
+                    continue
+
                 # If list_name provided but doesn't match, keep the item
                 if list_name is not None and item.get("list_name") != list_name:
                     new_pinned.append(item)

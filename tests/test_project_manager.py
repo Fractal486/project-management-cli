@@ -141,6 +141,64 @@ class ProjectManagerPersistenceTests(unittest.TestCase):
             self.assertIn("cannot load data", manager.last_error_message.lower())
 
 
+class ProjectManagerPinnedItemRemovalTests(unittest.TestCase):
+    def test_remove_pinned_section_with_empty_criteria_removes_none(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            data_path = Path(tmp) / "projects.json"
+            manager = ProjectManager(data_path)
+            manager.metadata["pinned_items"] = [
+                {"type": "section", "id": "sec1", "list_name": "Work", "section_idx": 0},
+                {"type": "section", "id": "sec2", "list_name": "Home", "section_idx": 1},
+                {"type": "task", "id": "task1"},
+            ]
+            manager._dirty = False
+
+            manager.remove_pinned_item("section", {})
+
+            self.assertEqual(
+                manager.metadata["pinned_items"],
+                [
+                    {"type": "section", "id": "sec1", "list_name": "Work", "section_idx": 0},
+                    {"type": "section", "id": "sec2", "list_name": "Home", "section_idx": 1},
+                    {"type": "task", "id": "task1"},
+                ],
+            )
+            self.assertFalse(manager._dirty)
+
+            manager.remove_pinned_item("section", {"list_name": None})
+            self.assertEqual(
+                manager.metadata["pinned_items"],
+                [
+                    {"type": "section", "id": "sec1", "list_name": "Work", "section_idx": 0},
+                    {"type": "section", "id": "sec2", "list_name": "Home", "section_idx": 1},
+                    {"type": "task", "id": "task1"},
+                ],
+            )
+            self.assertFalse(manager._dirty)
+
+    def test_remove_pinned_section_by_list_name_removes_matching_sections(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            data_path = Path(tmp) / "projects.json"
+            manager = ProjectManager(data_path)
+            manager.metadata["pinned_items"] = [
+                {"type": "section", "id": "sec1", "list_name": "Work", "section_idx": 0},
+                {"type": "section", "id": "sec2", "list_name": "Home", "section_idx": 1},
+                {"type": "task", "id": "task1"},
+            ]
+            manager._dirty = False
+
+            manager.remove_pinned_item("section", {"list_name": "Work"})
+
+            self.assertEqual(
+                manager.metadata["pinned_items"],
+                [
+                    {"type": "section", "id": "sec2", "list_name": "Home", "section_idx": 1},
+                    {"type": "task", "id": "task1"},
+                ],
+            )
+            self.assertTrue(manager._dirty)
+
+
 if __name__ == "__main__":  # pragma: no cover
     unittest.main()
 
