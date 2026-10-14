@@ -1,4 +1,4 @@
-<img src="assets/logo.png" alt="Project Management CLI terminal prompt logo" width="128" height="128">
+<img src="assets/logo.svg" alt="Project Management CLI terminal prompt logo" width="128" height="128">
 
 # Project Management CLI Tool
 
