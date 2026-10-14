@@ -1,3 +1,5 @@
+<img src="assets/logo.png" alt="Project Management CLI terminal prompt logo" width="128" height="128">
+
 # Project Management CLI Tool
 
 A modern, full-screen terminal-based project management tool built with Python. Features a live, persistent interface with comprehensive task management, project tracking, bookmarks, and extensive customization options.
